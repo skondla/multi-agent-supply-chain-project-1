@@ -22,7 +22,7 @@ jobs:
     name: Data Quality Validation
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Slack Notify MLOps Start
         uses: 8398a7/action-slack@v3
@@ -62,7 +62,7 @@ jobs:
     needs: data-validation
     if: ${{ github.event.inputs.model_type == 'all' || github.event.inputs.model_type == 'demand_forecast' || github.event_name == 'schedule' }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -99,7 +99,7 @@ jobs:
     needs: data-validation
     if: ${{ github.event.inputs.model_type == 'all' || github.event.inputs.model_type == 'anomaly_detection' || github.event_name == 'schedule' }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -130,7 +130,7 @@ jobs:
     needs: [train-demand-forecast, train-anomaly-detection]
     if: always()
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Set up Python
         uses: actions/setup-python@v5
