@@ -1,5 +1,5 @@
 # ── Builder Stage ──────────────────────────────────────────────────────────────
-FROM python:3.11-slim AS builder
+FROM python:3.14-slim AS builder
 
 WORKDIR /build
 
@@ -20,7 +20,7 @@ COPY requirements.txt .
 RUN pip install --user --no-warn-script-location -r requirements.txt
 
 # ── Production Stage ───────────────────────────────────────────────────────────
-FROM python:3.11-slim AS production
+FROM python:3.14-slim AS production
 
 LABEL maintainer="Supply Chain AI Team <team@supply-chain.ai>"
 LABEL version="1.0.0"
