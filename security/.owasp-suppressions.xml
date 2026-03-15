@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<suppressions xmlns="https://jeremylong.github.io/DependencyCheck/dependency-suppression.1.3.xsd">
+
+  <!-- Suppress false positives for development dependencies -->
+  <suppress>
+    <notes>Test-only dependency, not deployed to production</notes>
+    <packageUrl regex="true">^pkg:pypi/pytest.*$</packageUrl>
+    <cvssBelow>7.0</cvssBelow>
+  </suppress>
+
+  <suppress>
+    <notes>False positive - this CVE affects a different package version range</notes>
+    <packageUrl regex="true">^pkg:pypi/requests.*$</packageUrl>
+    <cve>CVE-2023-32681</cve>
+  </suppress>
+
+</suppressions>

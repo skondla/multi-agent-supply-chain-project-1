@@ -1,0 +1,41 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: supply-chain-api
+  namespace: supply-chain
+  annotations:
+    eks.amazonaws.com/role-arn: arn:aws:iam::ACCOUNT_ID:role/supply-chain-api-role
+automountServiceAccountToken: false
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: supply-chain-worker
+  namespace: supply-chain
+  annotations:
+    eks.amazonaws.com/role-arn: arn:aws:iam::ACCOUNT_ID:role/supply-chain-worker-role
+automountServiceAccountToken: false
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: supply-chain-api-role
+  namespace: supply-chain
+rules:
+  - apiGroups: [""]
+    resources: ["configmaps"]
+    verbs: ["get", "list"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: supply-chain-api-rolebinding
+  namespace: supply-chain
+subjects:
+  - kind: ServiceAccount
+    name: supply-chain-api
+    namespace: supply-chain
+roleRef:
+  kind: Role
+  apiGroup: rbac.authorization.k8s.io
+  name: supply-chain-api-role

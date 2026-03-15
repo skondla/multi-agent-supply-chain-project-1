@@ -1,0 +1,121 @@
+groups:
+  - name: ml.rules
+    rules:
+      # ── Model Performance ─────────────────────────────────────────────────────
+      - alert: DemandForecastMAPEHigh
+        expr: |
+          mlflow_model_metric{metric_name="mape", model_name="demand-forecast"} > 0.15
+        for: 1h
+        labels:
+          severity: warning
+          team: ml
+          service: mlflow
+        annotations:
+          summary: "Demand forecast MAPE above 15%"
+          description: "Model MAPE is {{ $value | humanizePercentage }}. Consider retraining."
+          runbook_url: "https://wiki.internal/runbooks/model-drift"
+
+      - alert: AnomalyDetectionF1Low
+        expr: |
+          mlflow_model_metric{metric_name="f1_score", model_name="anomaly-detection"} < 0.80
+        for: 1h
+        labels:
+          severity: warning
+          team: ml
+          service: mlflow
+        annotations:
+          summary: "Anomaly detection F1 below 0.80"
+          description: "Model F1 score is {{ $value }}. False negatives may be increasing."
+
+      # ── Data Drift ────────────────────────────────────────────────────────────
+      - alert: FeatureDriftDetected
+        expr: |
+          supply_chain_feature_drift_score > 0.20
+        for: 30m
+        labels:
+          severity: warning
+          team: ml
+          service: monitoring
+        annotations:
+          summary: "Feature drift detected: {{ $labels.feature }}"
+          description: "Feature {{ $labels.feature }} drift score is {{ $value }}. Model inputs shifting."
+          runbook_url: "https://wiki.internal/runbooks/data-drift"
+
+      - alert: PredictionDriftCritical
+        expr: |
+          supply_chain_prediction_drift_score > 0.30
+        for: 15m
+        labels:
+          severity: critical
+          team: ml
+          service: monitoring
+        annotations:
+          summary: "Prediction drift critical"
+          description: "Prediction distribution has drifted significantly ({{ $value }}). Immediate retraining needed."
+          slack_channel: "#alerts-ml"
+
+      # ── MLflow ────────────────────────────────────────────────────────────────
+      - alert: MLflowDown
+        expr: up{job="mlflow"} == 0
+        for: 5m
+        labels:
+          severity: warning
+          team: ml
+          service: mlflow
+        annotations:
+          summary: "MLflow tracking server is down"
+          description: "MLflow has been unreachable for 5 minutes. Model experiments cannot be logged."
+
+      - alert: ModelScoringLatencyHigh
+        expr: |
+          histogram_quantile(0.95,
+            sum(rate(supply_chain_model_scoring_seconds_bucket[5m])) by (le, model_name)
+          ) > 1.0
+        for: 5m
+        labels:
+          severity: warning
+          team: ml
+          service: inference
+        annotations:
+          summary: "Model {{ $labels.model_name }} scoring p95 above 1s"
+          description: "Scoring latency is {{ $value | humanizeDuration }}. Consider model optimization."
+
+      # ── Training Jobs ─────────────────────────────────────────────────────────
+      - alert: ModelTrainingFailed
+        expr: |
+          supply_chain_training_job_status{status="failed"} == 1
+        for: 0m
+        labels:
+          severity: warning
+          team: ml
+          service: training
+        annotations:
+          summary: "Model training job {{ $labels.job_name }} failed"
+          description: "Training job {{ $labels.job_name }} for model {{ $labels.model_name }} has failed."
+          runbook_url: "https://wiki.internal/runbooks/model-training-failure"
+
+      # ── LLM / Agent Costs ─────────────────────────────────────────────────────
+      - alert: LLMCostSpike
+        expr: |
+          sum(increase(agent_tokens_total[1h])) * 0.000015 > 50
+        for: 0m
+        labels:
+          severity: warning
+          team: ml
+          service: agents
+        annotations:
+          summary: "LLM cost spike: ${{ $value | humanize }} in last hour"
+          description: "Agent token costs exceeded $50/hour. Review traffic patterns or rate limits."
+
+      - alert: LLMDailyCostBudget
+        expr: |
+          sum(increase(agent_tokens_total[24h])) * 0.000015 > 500
+        for: 0m
+        labels:
+          severity: critical
+          team: ml
+          service: agents
+        annotations:
+          summary: "LLM daily cost budget exceeded: ${{ $value | humanize }}"
+          description: "Daily LLM spend has exceeded $500. Review and throttle if necessary."
+          slack_channel: "#alerts-ml"

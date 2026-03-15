@@ -1,0 +1,242 @@
+<mxfile host="app.diagrams.net" modified="2024-01-01T00:00:00.000Z" agent="Claude" version="21.0.0" type="device">
+  <diagram name="Supply Chain AI Platform" id="supply-chain-architecture">
+    <mxGraphModel dx="1422" dy="762" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1654" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- Title -->
+        <mxCell id="2" value="Supply Chain AI Platform - Architecture" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=20;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="400" y="20" width="800" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- Internet / Users -->
+        <mxCell id="3" value="Internet / Users" style="shape=cloud;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=12;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="50" y="100" width="160" height="80" as="geometry" />
+        </mxCell>
+
+        <!-- AWS ALB + WAF -->
+        <mxCell id="4" value="AWS ALB + WAF&#xa;(API Gateway)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d6b656;fontSize=11;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="290" y="110" width="160" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- Arrow: Internet to ALB -->
+        <mxCell id="5" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="3" target="4" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- EKS Cluster boundary -->
+        <mxCell id="6" value="AWS EKS Cluster (1.29) — 3-20 nodes (m5.xlarge)" style="points=[[0,0],[0.25,0],[0.5,0],[0.75,0],[1,0],[1,0.25],[1,0.5],[1,0.75],[1,1],[0.75,1],[0.5,1],[0.25,1],[0,1],[0,0.75],[0,0.5],[0,0.25]];shape=mxgraph.aws4.group;grIcon=mxgraph.aws4.group_eks;grStroke=0;verticalLabelPosition=top;verticalAlign=bottom;labelPosition=center;align=center;fillColor=#E6F2F8;strokeColor=#147EBA;fontStyle=1;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="520" y="60" width="760" height="520" as="geometry" />
+        </mxCell>
+
+        <!-- FastAPI -->
+        <mxCell id="7" value="FastAPI Application&#xa;(3-20 replicas, HPA)&#xa;uvicorn + uvloop" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="620" y="130" width="180" height="70" as="geometry" />
+        </mxCell>
+
+        <!-- Arrow: ALB to FastAPI -->
+        <mxCell id="8" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="4" target="7" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Orchestrator Agent -->
+        <mxCell id="9" value="🤖 Orchestrator Agent&#xa;(Claude Opus 4.6)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=11;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="840" y="130" width="180" height="70" as="geometry" />
+        </mxCell>
+
+        <!-- Arrow: FastAPI to Orchestrator -->
+        <mxCell id="10" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="7" target="9" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Inventory Agent -->
+        <mxCell id="11" value="📦 Inventory Agent&#xa;Stock Management" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=10" vertex="1" parent="1">
+          <mxGeometry x="560" y="260" width="140" height="55" as="geometry" />
+        </mxCell>
+
+        <!-- Order Agent -->
+        <mxCell id="12" value="🛒 Order Agent&#xa;Fraud Detection" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=10" vertex="1" parent="1">
+          <mxGeometry x="720" y="260" width="140" height="55" as="geometry" />
+        </mxCell>
+
+        <!-- Supplier Agent -->
+        <mxCell id="13" value="🏭 Supplier Agent&#xa;Vendor Evaluation" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=10" vertex="1" parent="1">
+          <mxGeometry x="880" y="260" width="140" height="55" as="geometry" />
+        </mxCell>
+
+        <!-- Logistics Agent -->
+        <mxCell id="14" value="🚚 Logistics Agent&#xa;Carrier Selection" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=10" vertex="1" parent="1">
+          <mxGeometry x="560" y="340" width="140" height="55" as="geometry" />
+        </mxCell>
+
+        <!-- Demand Forecast Agent -->
+        <mxCell id="15" value="📈 Demand Forecast&#xa;ML Prediction" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=10" vertex="1" parent="1">
+          <mxGeometry x="720" y="340" width="140" height="55" as="geometry" />
+        </mxCell>
+
+        <!-- Anomaly Detection Agent -->
+        <mxCell id="16" value="🔍 Anomaly Detection&#xa;Fraud &amp; Anomalies" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=10" vertex="1" parent="1">
+          <mxGeometry x="880" y="340" width="140" height="55" as="geometry" />
+        </mxCell>
+
+        <!-- Arrows: Orchestrator to agents -->
+        <mxCell id="17" style="edgeStyle=orthogonalEdgeStyle;curved=1;" edge="1" source="9" target="11" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="18" style="edgeStyle=orthogonalEdgeStyle;curved=1;" edge="1" source="9" target="12" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="19" style="edgeStyle=orthogonalEdgeStyle;curved=1;" edge="1" source="9" target="13" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="20" style="edgeStyle=orthogonalEdgeStyle;curved=1;" edge="1" source="9" target="14" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="21" style="edgeStyle=orthogonalEdgeStyle;curved=1;" edge="1" source="9" target="15" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="22" style="edgeStyle=orthogonalEdgeStyle;curved=1;" edge="1" source="9" target="16" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Celery Workers -->
+        <mxCell id="23" value="⚙️ Celery Workers&#xa;(2-10 replicas)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=10;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="1040" y="260" width="150" height="55" as="geometry" />
+        </mxCell>
+
+        <!-- Arrow: FastAPI to Celery -->
+        <mxCell id="24" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="7" target="23" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Data Layer -->
+        <!-- Aurora PostgreSQL -->
+        <mxCell id="25" value="🗄️ Aurora PostgreSQL 15&#xa;(Multi-AZ, r6g.2xlarge)" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=10;fillColor=#f8cecc;strokeColor=#b85450;fontSize=10;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="50" y="350" width="150" height="80" as="geometry" />
+        </mxCell>
+
+        <!-- ElastiCache Redis -->
+        <mxCell id="26" value="⚡ ElastiCache Redis 7&#xa;(r6g.large, cluster)" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=10;fillColor=#ff0000;strokeColor=#AE4132;fontColor=#ffffff;fontSize=10;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="50" y="460" width="150" height="80" as="geometry" />
+        </mxCell>
+
+        <!-- MSK Kafka -->
+        <mxCell id="27" value="📨 Amazon MSK&#xa;Kafka (3-broker)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontColor=#333333;fontSize=10;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="50" y="570" width="150" height="70" as="geometry" />
+        </mxCell>
+
+        <!-- MLflow -->
+        <mxCell id="28" value="🧪 MLflow&#xa;Model Registry&#xa;(XGBoost + IsoForest)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=10;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="1230" y="200" width="150" height="80" as="geometry" />
+        </mxCell>
+
+        <!-- S3 -->
+        <mxCell id="29" value="📦 Amazon S3&#xa;ML Artifacts" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d6b656;fontSize=10;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="1230" y="310" width="150" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- Monitoring Stack -->
+        <mxCell id="30" value="Monitoring Stack" style="points=[[0,0],[0.25,0],[0.5,0],[0.75,0],[1,0],[1,0.25],[1,0.5],[1,0.75],[1,1],[0.75,1],[0.5,1],[0.25,1],[0,1],[0,0.75],[0,0.5],[0,0.25]];shape=mxgraph.aws4.group;grIcon=mxgraph.aws4.group_cloudwatch;verticalLabelPosition=top;verticalAlign=bottom;labelPosition=center;align=center;fillColor=#F0F0F0;strokeColor=#AAA;fontStyle=1;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="50" y="680" width="500" height="120" as="geometry" />
+        </mxCell>
+
+        <!-- Prometheus -->
+        <mxCell id="31" value="📊 Prometheus" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d6b656;fontSize=10;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="70" y="710" width="100" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- Grafana -->
+        <mxCell id="32" value="📈 Grafana" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f97316;strokeColor=#ea580c;fontColor=#ffffff;fontSize=10;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="190" y="710" width="100" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- Jaeger -->
+        <mxCell id="33" value="🔭 Jaeger&#xa;Tracing" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#60a5fa;strokeColor=#2563eb;fontColor=#ffffff;fontSize=10;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="310" y="710" width="100" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- AlertManager -->
+        <mxCell id="34" value="🔔 AlertManager&#xa;+ Slack" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#9333ea;strokeColor=#7c3aed;fontColor=#ffffff;fontSize=10;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="430" y="710" width="100" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- CI/CD Pipeline -->
+        <mxCell id="35" value="CI/CD Pipelines (GitHub Actions)" style="points=[[0,0],[0.25,0],[0.5,0],[0.75,0],[1,0],[1,0.25],[1,0.5],[1,0.75],[1,1],[0.75,1],[0.5,1],[0.25,1],[0,1],[0,0.75],[0,0.5],[0,0.25]];shape=mxgraph.aws4.group;verticalLabelPosition=top;verticalAlign=bottom;labelPosition=center;align=center;fillColor=#FFFDE7;strokeColor=#F9A825;fontStyle=1;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="600" y="700" width="700" height="130" as="geometry" />
+        </mxCell>
+
+        <!-- CI -->
+        <mxCell id="36" value="CI&#xa;Lint+Test+Coverage" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff9c4;strokeColor=#f9a825;fontSize=9;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="615" y="730" width="110" height="55" as="geometry" />
+        </mxCell>
+
+        <!-- Security Scan -->
+        <mxCell id="37" value="Security Scan&#xa;OWASP+Semgrep&#xa;Gitleaks+CodeQL" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff9c4;strokeColor=#f9a825;fontSize=9;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="740" y="730" width="110" height="55" as="geometry" />
+        </mxCell>
+
+        <!-- Image Scan -->
+        <mxCell id="38" value="Image Scan&#xa;Trivy+Snyk&#xa;Hadolint" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff9c4;strokeColor=#f9a825;fontSize=9;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="865" y="730" width="110" height="55" as="geometry" />
+        </mxCell>
+
+        <!-- CD Production -->
+        <mxCell id="39" value="CD Production&#xa;Build+Deploy&#xa;EKS+Helm" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff9c4;strokeColor=#f9a825;fontSize=9;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="990" y="730" width="110" height="55" as="geometry" />
+        </mxCell>
+
+        <!-- MLOps -->
+        <mxCell id="40" value="MLOps&#xa;Train+Eval&#xa;Register" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff9c4;strokeColor=#f9a825;fontSize=9;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="1115" y="730" width="110" height="55" as="geometry" />
+        </mxCell>
+
+        <!-- Terraform -->
+        <mxCell id="41" value="Terraform IaC&#xa;VPC+EKS+RDS&#xa;Redis+Kafka" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff9c4;strokeColor=#f9a825;fontSize=9;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="1240" y="730" width="110" height="55" as="geometry" />
+        </mxCell>
+
+        <!-- Anthropic API -->
+        <mxCell id="42" value="🧠 Anthropic API&#xa;Claude Opus 4.6" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=10;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="1230" y="100" width="150" height="70" as="geometry" />
+        </mxCell>
+
+        <!-- Arrow: Orchestrator to Anthropic -->
+        <mxCell id="43" style="edgeStyle=orthogonalEdgeStyle;dashed=1;strokeColor=#9673a6;" edge="1" source="9" target="42" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- ECR -->
+        <mxCell id="44" value="🐳 ECR&#xa;Container Registry" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d6b656;fontSize=10;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="1230" y="400" width="150" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- LLMOps -->
+        <mxCell id="45" value="LLMOps&#xa;Prompt Registry&#xa;Cost Tracking&#xa;Guardrails" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e8daef;strokeColor=#8e44ad;fontSize=9;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="1040" y="420" width="120" height="75" as="geometry" />
+        </mxCell>
+
+        <!-- AIOps -->
+        <mxCell id="46" value="AIOps&#xa;Auto Remediation&#xa;Drift Detection&#xa;Log Analysis" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e8f8e8;strokeColor=#27ae60;fontSize=9;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="1040" y="520" width="120" height="75" as="geometry" />
+        </mxCell>
+
+        <!-- Slack -->
+        <mxCell id="47" value="💬 Slack&#xa;Notifications&#xa;All Stages" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#4a154b;strokeColor=#611f69;fontColor=#ffffff;fontSize=10;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="1230" y="490" width="150" height="70" as="geometry" />
+        </mxCell>
+
+        <!-- Security Labels -->
+        <mxCell id="48" value="Security: JWT Auth | RBAC | TLS | OWASP Top 10 | bcrypt | KMS | WAF" style="text;html=1;strokeColor=none;fillColor=#f8cecc;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=1;fontSize=10;fontStyle=1;borderColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="50" y="840" width="760" height="35" as="geometry" />
+        </mxCell>
+
+        <!-- Technology Stack Labels -->
+        <mxCell id="49" value="Stack: Python 3.11 | FastAPI | SQLAlchemy | Redis | Kafka | XGBoost | MLflow | Prometheus | OpenTelemetry" style="text;html=1;strokeColor=none;fillColor=#d5e8d4;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=1;fontSize=10;fontStyle=1;borderColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="850" y="840" width="760" height="35" as="geometry" />
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

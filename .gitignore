@@ -1,0 +1,79 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+dist/
+*.egg-info/
+.eggs/
+*.egg
+pip-log.txt
+
+# Virtual environments
+.env
+.venv
+env/
+venv/
+ENV/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+
+# Testing
+.pytest_cache/
+.coverage
+coverage.xml
+htmlcov/
+.tox/
+junit/
+test.db
+
+# Secrets - NEVER commit these
+*.pem
+*.key
+*.crt
+secrets/
+*.tfvars
+!infrastructure/terraform/environments/*.tfvars.example
+
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.backup
+*.tfplan
+.terraform.lock.hcl
+
+# Docker
+.docker/
+
+# Logs
+logs/
+*.log
+
+# ML artifacts
+mlruns/
+mlflow.db
+*.pkl
+*.joblib
+*.h5
+*.onnx
+models/
+
+# Build artifacts
+*.tar.gz
+*.zip
+
+# Node (for any frontend)
+node_modules/
+npm-debug.log*
+
+# Misc
+.cache/
+tmp/
+temp/

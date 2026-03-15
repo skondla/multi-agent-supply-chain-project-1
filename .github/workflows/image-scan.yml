@@ -1,0 +1,128 @@
+name: Container Image Scan
+
+on:
+  push:
+    branches: [main, develop]
+  workflow_call:
+    inputs:
+      image-tag:
+        required: false
+        type: string
+        default: latest
+
+permissions:
+  contents: read
+  security-events: write
+  packages: read
+
+env:
+  IMAGE_NAME: supply-chain-api
+
+jobs:
+  build-and-scan:
+    name: Build & Scan Container Image
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Slack Notify Build Start
+        uses: 8398a7/action-slack@v3
+        with:
+          status: custom
+          custom_payload: |
+            {"text": "🏗️ Building and scanning container image for commit `${{ github.sha }}`"}
+          webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: false
+          tags: ${{ env.IMAGE_NAME }}:${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          outputs: type=docker,dest=/tmp/image.tar
+          build-args: |
+            BUILD_DATE=${{ github.event.head_commit.timestamp }}
+            GIT_COMMIT=${{ github.sha }}
+
+      - name: Load image for scanning
+        run: docker load --input /tmp/image.tar
+
+      # ── Trivy Scan ──────────────────────────────────────────────────────────
+      - name: Trivy vulnerability scan (SARIF)
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: ${{ env.IMAGE_NAME }}:${{ github.sha }}
+          format: sarif
+          output: trivy-results.sarif
+          severity: CRITICAL,HIGH
+          ignore-unfixed: true
+          exit-code: 0  # Don't fail build, just report
+
+      - name: Trivy vulnerability scan (Table)
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: ${{ env.IMAGE_NAME }}:${{ github.sha }}
+          format: table
+          severity: CRITICAL,HIGH,MEDIUM
+          exit-code: 0
+
+      - name: Upload Trivy SARIF to GitHub Security
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: trivy-results.sarif
+
+      # ── Snyk Scan ───────────────────────────────────────────────────────────
+      - name: Snyk container scan
+        uses: snyk/actions/docker@master
+        continue-on-error: true
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          image: ${{ env.IMAGE_NAME }}:${{ github.sha }}
+          args: >
+            --severity-threshold=high
+            --file=Dockerfile
+            --json-file-output=snyk-results.json
+
+      # ── Hadolint Dockerfile Lint ─────────────────────────────────────────────
+      - name: Hadolint Dockerfile lint
+        uses: hadolint/hadolint-action@v3.1.0
+        with:
+          dockerfile: Dockerfile
+          format: sarif
+          output-file: hadolint-results.sarif
+          failure-threshold: error
+
+      - name: Upload Hadolint SARIF
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: hadolint-results.sarif
+
+      # ── Upload All Scan Artifacts ───────────────────────────────────────────
+      - name: Upload all scan results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: image-scan-results-${{ github.sha }}
+          path: |
+            trivy-results.sarif
+            snyk-results.json
+            hadolint-results.sarif
+
+      # ── Slack Notification ──────────────────────────────────────────────────
+      - name: Slack Notify Image Scan Result
+        if: always()
+        uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ job.status }}
+          text: |
+            Container image scan ${{ job.status }} for commit `${{ github.sha }}`
+            View results: ${{ github.server_url }}/${{ github.repository }}/security/code-scanning
+          webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}

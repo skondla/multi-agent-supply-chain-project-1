@@ -1,0 +1,14 @@
+apiVersion: v2
+name: supply-chain-api
+description: Supply Chain AI Platform Helm Chart
+type: application
+version: 1.0.0
+appVersion: "1.0.0"
+maintainers:
+  - name: Platform Team
+    email: platform@supply-chain.internal
+keywords:
+  - supply-chain
+  - ai
+  - fastapi
+  - multi-agent

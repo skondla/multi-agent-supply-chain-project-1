@@ -1,0 +1,528 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Supply Chain AI Platform - Architecture Diagram (draw.io SVG) -->
+<!-- Open with draw.io / diagrams.net to edit -->
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+     width="1600" height="1100" viewBox="0 0 1600 1100"
+     style="background:#f8f9fa; font-family: Segoe UI, Helvetica, Arial, sans-serif;">
+
+  <!-- Embedded draw.io XML for editing in diagrams.net -->
+  <desc>
+    &lt;mxfile&gt;&lt;diagram name="Supply Chain AI Platform"&gt;7VtbU+M4EP41qdo9mPIljv1IQgihig2VwLLso7AdRxvZ8lrKhezXb8uWL3JCmNnJTHaGhwFbkt1Sf93dreSMOF+ungS+ie9YSNMRssLliDs/IoQi28Y/cGSbHXGckxwIBAm10sEF+UPVQat2l4QkLUwUjKWCbIqDAVuvSSAKY1gItism+WKpYVmjSxYQVN6nQQijpUHcYhG5IAQb/oRoSMknj7sMcpIEpJs7jFJqM2OcJGm8oqnOAuJUkTTZJ4mnCnKbhAu+o3gUE7MgBt4UVg5yLBOBN4YS/MHrh1QX6OwAMECpE/bPuH89h/FxJt0M7Px/KbVHVXpZXsHVyqyGjxmRlAHGKB8B+IIEAQS4rIAo4g2xmWEYfaTj6yUMCQBGMPJRCsWMMKCFY7JZUIK5CpMTIqxWAGz2DjMnFmpMQNhVKqAAHUgW4BDrFKdMXHhGFQBGwuiEFHgjABi6VhNvMsGRkGcNIBaIIiVyACCHHFiOC5C8ikA8bkJRXQEMqJEXBhUGRjjsFIh0IDMQ0cHkFOVyJICCy1gBHHKBTgQQAhqAIGALiJCHDJIchNDJJXFQNJBgHU+QFQ6UQlkBGY4IiMoLQqVlLgqLME0eBYm8SB0ApLAdYk1JNhbGCaFxBOAGgAUmGEGSAEuJMLWAHMKBYb1KBEBJAIaEBGRIkKEFAHFmBMLCLKEO4BGIKQNBIABYQEC4CZICwSCNJBQRJBN0FMSQABJoCQIACZAUEABpBQAOAJgQABCBEQAMCAQJBFAQAKQNCARqIEBMBIAMSAAAIBSABUBCQCEQpkBoCDBCCEBCRBARRAqAEBABQBtAEBAQAAQQAEAACAMAAAABACAABBAAAAEAAAAAAABAAAAAAAABAAAIAAKAAAAAAAAAAAABAAAAAAAABAAAEBEAAAABAABAAAABAAAAAEAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==&lt;/diagram&gt;&lt;/mxfile&gt;
+  </desc>
+
+  <defs>
+    <style>
+      .title { font-size: 22px; font-weight: bold; fill: #1a1a2e; }
+      .section-label { font-size: 13px; font-weight: bold; }
+      .node-label { font-size: 11px; font-weight: 600; }
+      .node-sublabel { font-size: 9px; fill: #555; }
+      .arrow { stroke-width: 1.5; fill: none; }
+      .dashed { stroke-dasharray: 6,3; }
+    </style>
+    <!-- Arrowhead marker -->
+    <marker id="arrow" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <polygon points="0 0, 8 3, 0 6" fill="#666" />
+    </marker>
+    <marker id="arrow-blue" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <polygon points="0 0, 8 3, 0 6" fill="#2563eb" />
+    </marker>
+    <marker id="arrow-purple" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <polygon points="0 0, 8 3, 0 6" fill="#7c3aed" />
+    </marker>
+    <marker id="arrow-green" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <polygon points="0 0, 8 3, 0 6" fill="#059669" />
+    </marker>
+    <!-- Drop shadow -->
+    <filter id="shadow" x="-5%" y="-5%" width="115%" height="115%">
+      <feDropShadow dx="2" dy="2" stdDeviation="3" flood-color="#00000020" />
+    </filter>
+    <!-- Subtle gradient backgrounds -->
+    <linearGradient id="grad-blue" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#eff6ff;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#dbeafe;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="grad-purple" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#f5f3ff;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#ede9fe;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="grad-green" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#f0fdf4;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#dcfce7;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="grad-orange" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#fff7ed;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#ffedd5;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="grad-red" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#fff1f2;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#ffe4e6;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="grad-yellow" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#fefce8;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#fef08a;stop-opacity:0.5" />
+    </linearGradient>
+    <linearGradient id="grad-dark" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#1e1b4b;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#312e81;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <!-- BACKGROUND & TITLE                                                      -->
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <rect width="1600" height="1100" rx="12" fill="#f1f5f9" />
+  <rect x="0" y="0" width="1600" height="62" rx="12" fill="url(#grad-dark)" />
+  <rect x="0" y="50" width="1600" height="12" fill="url(#grad-dark)" />
+
+  <text x="800" y="38" text-anchor="middle" style="font-size:20px;font-weight:700;fill:#fff;letter-spacing:1px">
+    Supply Chain AI Platform — Production Architecture
+  </text>
+  <text x="800" y="55" text-anchor="middle" style="font-size:10px;fill:#a5b4fc;letter-spacing:0.5px">
+    Multi-Agent Orchestration · AWS EKS · Claude Opus 4.6 · Terraform IaC · GitHub Actions CI/CD
+  </text>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <!-- LAYER 1 — INTERNET / CLIENTS                                           -->
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <rect x="20" y="75" width="150" height="100" rx="10" fill="url(#grad-blue)" stroke="#93c5fd" stroke-width="1.5" filter="url(#shadow)" />
+  <text x="95" y="105" text-anchor="middle" style="font-size:22px">🌐</text>
+  <text x="95" y="125" text-anchor="middle" class="node-label" fill="#1e40af">Internet</text>
+  <text x="95" y="140" text-anchor="middle" class="node-sublabel">Web / Mobile</text>
+  <text x="95" y="155" text-anchor="middle" class="node-sublabel">REST / gRPC</text>
+
+  <!-- Arrow: Internet → WAF -->
+  <line x1="170" y1="125" x2="218" y2="125" stroke="#666" stroke-width="1.5" marker-end="url(#arrow)" />
+
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <!-- LAYER 2 — AWS EDGE                                                      -->
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <rect x="220" y="75" width="160" height="100" rx="10" fill="url(#grad-orange)" stroke="#fb923c" stroke-width="1.5" filter="url(#shadow)" />
+  <text x="300" y="105" text-anchor="middle" style="font-size:20px">🛡️</text>
+  <text x="300" y="125" text-anchor="middle" class="node-label" fill="#c2410c">AWS ALB + WAF</text>
+  <text x="300" y="140" text-anchor="middle" class="node-sublabel">Rate Limit: 2000 req/IP</text>
+  <text x="300" y="155" text-anchor="middle" class="node-sublabel">OWASP Managed Rules</text>
+
+  <!-- Arrow: WAF → FastAPI -->
+  <line x1="380" y1="125" x2="428" y2="125" stroke="#666" stroke-width="1.5" marker-end="url(#arrow)" />
+
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <!-- EKS CLUSTER BOUNDARY                                                    -->
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <rect x="430" y="68" width="840" height="390" rx="14" fill="#f0f9ff" stroke="#0284c7" stroke-width="2" stroke-dasharray="8,4" />
+  <rect x="430" y="68" width="840" height="28" rx="14" fill="#0284c7" />
+  <rect x="430" y="82" width="840" height="14" fill="#0284c7" />
+  <text x="850" y="87" text-anchor="middle" style="font-size:12px;font-weight:700;fill:#fff">
+    AWS EKS Cluster (kubernetes 1.29) — 3 to 20 nodes (m5.xlarge / m5.2xlarge) — HPA enabled
+  </text>
+
+  <!-- ─── FastAPI ─────────────────────────────────────────────────────────── -->
+  <rect x="445" y="102" width="185" height="85" rx="10" fill="url(#grad-green)" stroke="#16a34a" stroke-width="1.5" filter="url(#shadow)" />
+  <text x="537" y="128" text-anchor="middle" style="font-size:18px">⚡</text>
+  <text x="537" y="148" text-anchor="middle" class="node-label" fill="#15803d">FastAPI Application</text>
+  <text x="537" y="163" text-anchor="middle" class="node-sublabel">3–20 replicas · uvicorn + uvloop</text>
+  <text x="537" y="177" text-anchor="middle" class="node-sublabel">Prometheus · OpenTelemetry</text>
+
+  <!-- Arrow: FastAPI → Orchestrator -->
+  <line x1="630" y1="144" x2="678" y2="144" stroke="#2563eb" stroke-width="2" marker-end="url(#arrow-blue)" />
+  <text x="654" y="138" text-anchor="middle" style="font-size:8px;fill:#2563eb">task</text>
+
+  <!-- ─── Orchestrator Agent ──────────────────────────────────────────────── -->
+  <rect x="680" y="102" width="190" height="85" rx="10" fill="url(#grad-purple)" stroke="#7c3aed" stroke-width="2" filter="url(#shadow)" />
+  <text x="775" y="128" text-anchor="middle" style="font-size:18px">🤖</text>
+  <text x="775" y="148" text-anchor="middle" class="node-label" fill="#6d28d9">Orchestrator Agent</text>
+  <text x="775" y="163" text-anchor="middle" class="node-sublabel">Claude Opus 4.6</text>
+  <text x="775" y="177" text-anchor="middle" class="node-sublabel">analyze · route · aggregate</text>
+
+  <!-- Arrow: Orchestrator → Anthropic API (right side) -->
+  <line x1="870" y1="130" x2="1248" y2="130" stroke="#7c3aed" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arrow-purple)" />
+
+  <!-- Arrows: Orchestrator → 6 agents -->
+  <!-- Down to agents row 1 -->
+  <line x1="720" y1="187" x2="500" y2="240" stroke="#7c3aed" stroke-width="1.2" marker-end="url(#arrow-purple)" />
+  <line x1="750" y1="187" x2="660" y2="240" stroke="#7c3aed" stroke-width="1.2" marker-end="url(#arrow-purple)" />
+  <line x1="790" y1="187" x2="820" y2="240" stroke="#7c3aed" stroke-width="1.2" marker-end="url(#arrow-purple)" />
+  <!-- Down to agents row 2 -->
+  <line x1="720" y1="187" x2="500" y2="330" stroke="#7c3aed" stroke-width="1.2" stroke-dasharray="4,2" marker-end="url(#arrow-purple)" />
+  <line x1="760" y1="187" x2="660" y2="330" stroke="#7c3aed" stroke-width="1.2" stroke-dasharray="4,2" marker-end="url(#arrow-purple)" />
+  <line x1="800" y1="187" x2="820" y2="330" stroke="#7c3aed" stroke-width="1.2" stroke-dasharray="4,2" marker-end="url(#arrow-purple)" />
+
+  <!-- ─── Agent Row 1 ─────────────────────────────────────────────────────── -->
+  <!-- Inventory Agent -->
+  <rect x="445" y="240" width="155" height="72" rx="8" fill="#fefce8" stroke="#ca8a04" stroke-width="1.5" filter="url(#shadow)" />
+  <text x="522" y="263" text-anchor="middle" style="font-size:16px">📦</text>
+  <text x="522" y="281" text-anchor="middle" class="node-label" fill="#92400e">Inventory Agent</text>
+  <text x="522" y="296" text-anchor="middle" class="node-sublabel">Stock · Reorder · Reserve</text>
+  <text x="522" y="307" text-anchor="middle" class="node-sublabel">check_level · calc_reorder</text>
+
+  <!-- Order Agent -->
+  <rect x="612" y="240" width="155" height="72" rx="8" fill="#fefce8" stroke="#ca8a04" stroke-width="1.5" filter="url(#shadow)" />
+  <text x="689" y="263" text-anchor="middle" style="font-size:16px">🛒</text>
+  <text x="689" y="281" text-anchor="middle" class="node-label" fill="#92400e">Order Agent</text>
+  <text x="689" y="296" text-anchor="middle" class="node-sublabel">Validate · Fraud Detection</text>
+  <text x="689" y="307" text-anchor="middle" class="node-sublabel">check_fraud · calc_total</text>
+
+  <!-- Supplier Agent -->
+  <rect x="779" y="240" width="155" height="72" rx="8" fill="#fefce8" stroke="#ca8a04" stroke-width="1.5" filter="url(#shadow)" />
+  <text x="856" y="263" text-anchor="middle" style="font-size:16px">🏭</text>
+  <text x="856" y="281" text-anchor="middle" class="node-label" fill="#92400e">Supplier Agent</text>
+  <text x="856" y="296" text-anchor="middle" class="node-sublabel">Evaluate · RFQ · Compliance</text>
+  <text x="856" y="307" text-anchor="middle" class="node-sublabel">get_performance · gen_rfq</text>
+
+  <!-- ─── Agent Row 2 ─────────────────────────────────────────────────────── -->
+  <!-- Logistics Agent -->
+  <rect x="445" y="330" width="155" height="72" rx="8" fill="#fefce8" stroke="#ca8a04" stroke-width="1.5" filter="url(#shadow)" />
+  <text x="522" y="353" text-anchor="middle" style="font-size:16px">🚚</text>
+  <text x="522" y="371" text-anchor="middle" class="node-label" fill="#92400e">Logistics Agent</text>
+  <text x="522" y="386" text-anchor="middle" class="node-sublabel">Carrier · Track · Exception</text>
+  <text x="522" y="397" text-anchor="middle" class="node-sublabel">select_carrier · track_ship</text>
+
+  <!-- Demand Forecast Agent -->
+  <rect x="612" y="330" width="155" height="72" rx="8" fill="#fefce8" stroke="#ca8a04" stroke-width="1.5" filter="url(#shadow)" />
+  <text x="689" y="353" text-anchor="middle" style="font-size:16px">📈</text>
+  <text x="689" y="371" text-anchor="middle" class="node-label" fill="#92400e">Demand Forecast</text>
+  <text x="689" y="386" text-anchor="middle" class="node-sublabel">ML Prediction · Trends</text>
+  <text x="689" y="397" text-anchor="middle" class="node-sublabel">XGBoost · IsolationForest</text>
+
+  <!-- Anomaly Detection Agent -->
+  <rect x="779" y="330" width="155" height="72" rx="8" fill="#fefce8" stroke="#ca8a04" stroke-width="1.5" filter="url(#shadow)" />
+  <text x="856" y="353" text-anchor="middle" style="font-size:16px">🔍</text>
+  <text x="856" y="371" text-anchor="middle" class="node-label" fill="#92400e">Anomaly Detection</text>
+  <text x="856" y="386" text-anchor="middle" class="node-sublabel">Fraud · Anomaly Score</text>
+  <text x="856" y="397" text-anchor="middle" class="node-sublabel">detect · score · classify</text>
+
+  <!-- ─── Celery Workers ──────────────────────────────────────────────────── -->
+  <rect x="955" y="102" width="165" height="85" rx="10" fill="url(#grad-blue)" stroke="#3b82f6" stroke-width="1.5" filter="url(#shadow)" />
+  <text x="1037" y="128" text-anchor="middle" style="font-size:18px">⚙️</text>
+  <text x="1037" y="148" text-anchor="middle" class="node-label" fill="#1d4ed8">Celery Workers</text>
+  <text x="1037" y="163" text-anchor="middle" class="node-sublabel">2–10 replicas · Beat Scheduler</text>
+  <text x="1037" y="177" text-anchor="middle" class="node-sublabel">orders · inventory · ml · alerts</text>
+
+  <!-- Arrow: FastAPI → Celery -->
+  <line x1="630" y1="155" x2="955" y2="155" stroke="#3b82f6" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arrow-blue)" />
+  <text x="793" y="149" text-anchor="middle" style="font-size:8px;fill:#3b82f6">async tasks</text>
+
+  <!-- ─── LLMOps Box ──────────────────────────────────────────────────────── -->
+  <rect x="955" y="220" width="165" height="110" rx="10" fill="#fdf4ff" stroke="#a855f7" stroke-width="1.5" filter="url(#shadow)" />
+  <text x="1037" y="243" text-anchor="middle" style="font-size:14px">✨</text>
+  <text x="1037" y="258" text-anchor="middle" class="node-label" fill="#7e22ce">LLMOps</text>
+  <text x="1037" y="273" text-anchor="middle" class="node-sublabel">Prompt Registry v1.0/v1.1</text>
+  <text x="1037" y="287" text-anchor="middle" class="node-sublabel">Cost Tracker · Guardrails</text>
+  <text x="1037" y="301" text-anchor="middle" class="node-sublabel">A/B Testing · Rate Limiting</text>
+  <text x="1037" y="315" text-anchor="middle" class="node-sublabel">PII Redaction · Injection Detect</text>
+
+  <!-- Arrow: Orchestrator → LLMOps -->
+  <line x1="870" y1="180" x2="955" y2="250" stroke="#a855f7" stroke-width="1.2" stroke-dasharray="4,2" marker-end="url(#arrow-purple)" />
+
+  <!-- ─── AIOps Box ───────────────────────────────────────────────────────── -->
+  <rect x="955" y="345" width="165" height="100" rx="10" fill="#f0fdf4" stroke="#22c55e" stroke-width="1.5" filter="url(#shadow)" />
+  <text x="1037" y="368" text-anchor="middle" style="font-size:14px">🤖</text>
+  <text x="1037" y="383" text-anchor="middle" class="node-label" fill="#15803d">AIOps</text>
+  <text x="1037" y="398" text-anchor="middle" class="node-sublabel">Auto Remediation (5 actions)</text>
+  <text x="1037" y="412" text-anchor="middle" class="node-sublabel">Drift Detector (PSI/Z-score)</text>
+  <text x="1037" y="426" text-anchor="middle" class="node-sublabel">Log Analysis · Runbooks</text>
+  <text x="1037" y="440" text-anchor="middle" class="node-sublabel">Retrain Trigger · Scale Pods</text>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <!-- RIGHT COLUMN — External Services                                        -->
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+
+  <!-- Anthropic API -->
+  <rect x="1250" y="102" width="165" height="85" rx="10" fill="url(#grad-purple)" stroke="#7c3aed" stroke-width="2" filter="url(#shadow)" />
+  <text x="1332" y="128" text-anchor="middle" style="font-size:18px">🧠</text>
+  <text x="1332" y="148" text-anchor="middle" class="node-label" fill="#6d28d9">Anthropic API</text>
+  <text x="1332" y="163" text-anchor="middle" class="node-sublabel">Claude Opus 4.6</text>
+  <text x="1332" y="177" text-anchor="middle" class="node-sublabel">tool_use · agentic loop</text>
+
+  <!-- MLflow -->
+  <rect x="1250" y="210" width="165" height="85" rx="10" fill="url(#grad-green)" stroke="#16a34a" stroke-width="1.5" filter="url(#shadow)" />
+  <text x="1332" y="236" text-anchor="middle" style="font-size:18px">🧪</text>
+  <text x="1332" y="256" text-anchor="middle" class="node-label" fill="#15803d">MLflow</text>
+  <text x="1332" y="271" text-anchor="middle" class="node-sublabel">Model Registry + Tracking</text>
+  <text x="1332" y="285" text-anchor="middle" class="node-sublabel">XGBoost · IsolationForest</text>
+
+  <!-- Arrow: DemandForecast → MLflow -->
+  <line x1="934" y1="380" x2="1250" y2="270" stroke="#16a34a" stroke-width="1.2" stroke-dasharray="4,2" marker-end="url(#arrow-green)" />
+
+  <!-- ECR -->
+  <rect x="1250" y="318" width="165" height="75" rx="10" fill="url(#grad-orange)" stroke="#f97316" stroke-width="1.5" filter="url(#shadow)" />
+  <text x="1332" y="342" text-anchor="middle" style="font-size:16px">🐳</text>
+  <text x="1332" y="360" text-anchor="middle" class="node-label" fill="#c2410c">Amazon ECR</text>
+  <text x="1332" y="375" text-anchor="middle" class="node-sublabel">supply-chain-api</text>
+  <text x="1332" y="388" text-anchor="middle" class="node-sublabel">Trivy Scan on Push</text>
+
+  <!-- S3 -->
+  <rect x="1250" y="410" width="165" height="55" rx="10" fill="url(#grad-orange)" stroke="#f97316" stroke-width="1.5" filter="url(#shadow)" />
+  <text x="1332" y="433" text-anchor="middle" style="font-size:14px">📦</text>
+  <text x="1332" y="450" text-anchor="middle" class="node-label" fill="#c2410c">Amazon S3</text>
+  <text x="1332" y="462" text-anchor="middle" class="node-sublabel">MLflow Artifacts · Versioned</text>
+
+  <!-- Slack -->
+  <rect x="1440" y="102" width="145" height="85" rx="10" fill="#4a154b" stroke="#611f69" stroke-width="1.5" filter="url(#shadow)" />
+  <text x="1512" y="128" text-anchor="middle" style="font-size:18px">💬</text>
+  <text x="1512" y="148" text-anchor="middle" class="node-label" fill="#fff">Slack</text>
+  <text x="1512" y="163" text-anchor="middle" style="font-size:9px;fill:#e0c3e8">#alerts-critical</text>
+  <text x="1512" y="177" text-anchor="middle" style="font-size:9px;fill:#e0c3e8">#alerts-ml · #alerts-platform</text>
+
+  <!-- Arrow: Anthropic → Slack -->
+  <line x1="1415" y1="144" x2="1440" y2="144" stroke="#7c3aed" stroke-width="1.2" stroke-dasharray="4,2" marker-end="url(#arrow-purple)" />
+
+  <!-- PagerDuty -->
+  <rect x="1440" y="210" width="145" height="60" rx="10" fill="#06ac38" stroke="#039129" stroke-width="1.5" filter="url(#shadow)" />
+  <text x="1512" y="234" text-anchor="middle" style="font-size:14px">🚨</text>
+  <text x="1512" y="252" text-anchor="middle" class="node-label" fill="#fff">PagerDuty</text>
+  <text x="1512" y="264" text-anchor="middle" style="font-size:9px;fill:#bbf7d0">Critical alert escalation</text>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <!-- DATA LAYER                                                               -->
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <rect x="20" y="480" width="1565" height="165" rx="12" fill="#fff7ed" stroke="#f97316" stroke-width="2" />
+  <text x="30" y="502" class="section-label" fill="#c2410c" style="font-size:13px">📊  Data Layer</text>
+
+  <!-- PostgreSQL Aurora -->
+  <rect x="35" y="512" width="210" height="115" rx="10" fill="url(#grad-red)" stroke="#ef4444" stroke-width="1.5" filter="url(#shadow)" />
+  <text x="140" y="538" text-anchor="middle" style="font-size:22px">🗄️</text>
+  <text x="140" y="560" text-anchor="middle" class="node-label" fill="#991b1b">Aurora PostgreSQL 15</text>
+  <text x="140" y="576" text-anchor="middle" class="node-sublabel">Multi-AZ · db.r6g.2xlarge</text>
+  <text x="140" y="591" text-anchor="middle" class="node-sublabel">5 tables: orders, inventory</text>
+  <text x="140" y="606" text-anchor="middle" class="node-sublabel">suppliers, shipments, users</text>
+  <text x="140" y="619" text-anchor="middle" class="node-sublabel">JSONB · UUID · pg_trgm · GIN</text>
+
+  <!-- ElastiCache Redis -->
+  <rect x="265" y="512" width="210" height="115" rx="10" fill="#fff1f2" stroke="#ef4444" stroke-width="1.5" filter="url(#shadow)" />
+  <text x="370" y="538" text-anchor="middle" style="font-size:22px">⚡</text>
+  <text x="370" y="560" text-anchor="middle" class="node-label" fill="#991b1b">ElastiCache Redis 7</text>
+  <text x="370" y="576" text-anchor="middle" class="node-sublabel">cache.r6g.large · 3-node cluster</text>
+  <text x="370" y="591" text-anchor="middle" class="node-sublabel">Session · Cache · Rate Limit</text>
+  <text x="370" y="606" text-anchor="middle" class="node-sublabel">Celery broker + result backend</text>
+  <text x="370" y="619" text-anchor="middle" class="node-sublabel">TLS · auth_token · allkeys-lru</text>
+
+  <!-- MSK Kafka -->
+  <rect x="495" y="512" width="210" height="115" rx="10" fill="#f5f5f4" stroke="#78716c" stroke-width="1.5" filter="url(#shadow)" />
+  <text x="600" y="538" text-anchor="middle" style="font-size:22px">📨</text>
+  <text x="600" y="560" text-anchor="middle" class="node-label" fill="#44403c">Amazon MSK Kafka</text>
+  <text x="600" y="576" text-anchor="middle" class="node-sublabel">3-broker · kafka.m5.2xlarge</text>
+  <text x="600" y="591" text-anchor="middle" class="node-sublabel">order-events · inventory-events</text>
+  <text x="600" y="606" text-anchor="middle" class="node-sublabel">alert-events · supply-chain-*</text>
+  <text x="600" y="619" text-anchor="middle" class="node-sublabel">SASL/IAM · TLS · 7-day retention</text>
+
+  <!-- Alembic / DB Schema -->
+  <rect x="725" y="512" width="185" height="115" rx="10" fill="url(#grad-blue)" stroke="#3b82f6" stroke-width="1.5" filter="url(#shadow)" />
+  <text x="817" y="538" text-anchor="middle" style="font-size:20px">🔄</text>
+  <text x="817" y="558" text-anchor="middle" class="node-label" fill="#1d4ed8">Alembic Migrations</text>
+  <text x="817" y="574" text-anchor="middle" class="node-sublabel">async SQLAlchemy + asyncpg</text>
+  <text x="817" y="589" text-anchor="middle" class="node-sublabel">001_initial_schema.py</text>
+  <text x="817" y="604" text-anchor="middle" class="node-sublabel">pool_size=20 · NullPool(test)</text>
+  <text x="817" y="619" text-anchor="middle" class="node-sublabel">rollback fixtures in tests</text>
+
+  <!-- KMS / Secrets Manager -->
+  <rect x="930" y="512" width="185" height="115" rx="10" fill="url(#grad-orange)" stroke="#f97316" stroke-width="1.5" filter="url(#shadow)" />
+  <text x="1022" y="538" text-anchor="middle" style="font-size:20px">🔑</text>
+  <text x="1022" y="558" text-anchor="middle" class="node-label" fill="#c2410c">AWS KMS + Secrets</text>
+  <text x="1022" y="574" text-anchor="middle" class="node-sublabel">KMS key rotation enabled</text>
+  <text x="1022" y="589" text-anchor="middle" class="node-sublabel">DB credentials → Secrets Mgr</text>
+  <text x="1022" y="604" text-anchor="middle" class="node-sublabel">Redis auth → Secrets Mgr</text>
+  <text x="1022" y="619" text-anchor="middle" class="node-sublabel">EKS secrets encryption</text>
+
+  <!-- VPC / Networking -->
+  <rect x="1135" y="512" width="185" height="115" rx="10" fill="url(#grad-blue)" stroke="#3b82f6" stroke-width="1.5" filter="url(#shadow)" />
+  <text x="1227" y="538" text-anchor="middle" style="font-size:20px">🌐</text>
+  <text x="1227" y="558" text-anchor="middle" class="node-label" fill="#1d4ed8">AWS VPC (Terraform)</text>
+  <text x="1227" y="574" text-anchor="middle" class="node-sublabel">3 AZs · 10.0.0.0/16</text>
+  <text x="1227" y="589" text-anchor="middle" class="node-sublabel">Public / Private / DB subnets</text>
+  <text x="1227" y="604" text-anchor="middle" class="node-sublabel">NAT GW · VPC Flow Logs</text>
+  <text x="1227" y="619" text-anchor="middle" class="node-sublabel">NetworkPolicies · IRSA</text>
+
+  <!-- IAM / Security -->
+  <rect x="1340" y="512" width="235" height="115" rx="10" fill="#fff1f2" stroke="#ef4444" stroke-width="1.5" filter="url(#shadow)" />
+  <text x="1457" y="538" text-anchor="middle" style="font-size:20px">🔒</text>
+  <text x="1457" y="558" text-anchor="middle" class="node-label" fill="#991b1b">Security (OWASP Top 10)</text>
+  <text x="1457" y="574" text-anchor="middle" class="node-sublabel">JWT (RS256) · RBAC · bcrypt</text>
+  <text x="1457" y="589" text-anchor="middle" class="node-sublabel">TLS everywhere · HSTS · CSP</text>
+  <text x="1457" y="604" text-anchor="middle" class="node-sublabel">IMDSv2 · ReadOnlyRootFS</text>
+  <text x="1457" y="619" text-anchor="middle" class="node-sublabel">NonRoot pods · Drop ALL caps</text>
+
+  <!-- Vertical arrows from EKS to Data Layer -->
+  <line x1="537" y1="458" x2="140" y2="512" stroke="#666" stroke-width="1.2" stroke-dasharray="4,2" marker-end="url(#arrow)" />
+  <line x1="537" y1="458" x2="370" y2="512" stroke="#666" stroke-width="1.2" stroke-dasharray="4,2" marker-end="url(#arrow)" />
+  <line x1="537" y1="458" x2="600" y2="512" stroke="#666" stroke-width="1.2" stroke-dasharray="4,2" marker-end="url(#arrow)" />
+
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <!-- MONITORING LAYER                                                         -->
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <rect x="20" y="665" width="840" height="150" rx="12" fill="#fafaf9" stroke="#78716c" stroke-width="2" />
+  <text x="30" y="686" class="section-label" fill="#44403c" style="font-size:13px">📊  Observability Stack</text>
+
+  <!-- Prometheus -->
+  <rect x="35" y="695" width="140" height="105" rx="8" fill="url(#grad-orange)" stroke="#f97316" stroke-width="1.5" filter="url(#shadow)" />
+  <text x="105" y="718" text-anchor="middle" style="font-size:16px">📊</text>
+  <text x="105" y="736" text-anchor="middle" class="node-label" fill="#c2410c">Prometheus</text>
+  <text x="105" y="751" text-anchor="middle" class="node-sublabel">15s scrape · K8s SD</text>
+  <text x="105" y="766" text-anchor="middle" class="node-sublabel">api-alerts.yml</text>
+  <text x="105" y="780" text-anchor="middle" class="node-sublabel">infra-alerts.yml</text>
+  <text x="105" y="793" text-anchor="middle" class="node-sublabel">ml-alerts.yml</text>
+
+  <!-- Grafana -->
+  <rect x="190" y="695" width="140" height="105" rx="8" fill="#f97316" stroke="#ea580c" stroke-width="1.5" filter="url(#shadow)" />
+  <text x="260" y="718" text-anchor="middle" style="font-size:16px">📈</text>
+  <text x="260" y="736" text-anchor="middle" class="node-label" fill="#fff">Grafana</text>
+  <text x="260" y="751" text-anchor="middle" style="font-size:9px;fill:#fff8f1">Overview Dashboard</text>
+  <text x="260" y="766" text-anchor="middle" style="font-size:9px;fill:#fff8f1">LLM Cost Tracking</text>
+  <text x="260" y="780" text-anchor="middle" style="font-size:9px;fill:#fff8f1">Agent Performance</text>
+  <text x="260" y="793" text-anchor="middle" style="font-size:9px;fill:#fff8f1">localhost:3000</text>
+
+  <!-- Jaeger -->
+  <rect x="345" y="695" width="140" height="105" rx="8" fill="#3b82f6" stroke="#2563eb" stroke-width="1.5" filter="url(#shadow)" />
+  <text x="415" y="718" text-anchor="middle" style="font-size:16px">🔭</text>
+  <text x="415" y="736" text-anchor="middle" class="node-label" fill="#fff">Jaeger Tracing</text>
+  <text x="415" y="751" text-anchor="middle" style="font-size:9px;fill:#eff6ff">OpenTelemetry OTLP</text>
+  <text x="415" y="766" text-anchor="middle" style="font-size:9px;fill:#eff6ff">Distributed traces</text>
+  <text x="415" y="780" text-anchor="middle" style="font-size:9px;fill:#eff6ff">Agent call chains</text>
+  <text x="415" y="793" text-anchor="middle" style="font-size:9px;fill:#eff6ff">localhost:16686</text>
+
+  <!-- Alertmanager -->
+  <rect x="500" y="695" width="140" height="105" rx="8" fill="#7c3aed" stroke="#6d28d9" stroke-width="1.5" filter="url(#shadow)" />
+  <text x="570" y="718" text-anchor="middle" style="font-size:16px">🔔</text>
+  <text x="570" y="736" text-anchor="middle" class="node-label" fill="#fff">Alertmanager</text>
+  <text x="570" y="751" text-anchor="middle" style="font-size:9px;fill:#f3e8ff">Slack routing</text>
+  <text x="570" y="766" text-anchor="middle" style="font-size:9px;fill:#f3e8ff">PagerDuty escalation</text>
+  <text x="570" y="780" text-anchor="middle" style="font-size:9px;fill:#f3e8ff">Inhibit rules</text>
+  <text x="570" y="793" text-anchor="middle" style="font-size:9px;fill:#f3e8ff">5m resolve timeout</text>
+
+  <!-- Structlog -->
+  <rect x="655" y="695" width="190" height="105" rx="8" fill="url(#grad-green)" stroke="#16a34a" stroke-width="1.5" filter="url(#shadow)" />
+  <text x="750" y="718" text-anchor="middle" style="font-size:16px">📝</text>
+  <text x="750" y="736" text-anchor="middle" class="node-label" fill="#15803d">Structured Logging</text>
+  <text x="750" y="751" text-anchor="middle" class="node-sublabel">structlog · JSON prod</text>
+  <text x="750" y="766" text-anchor="middle" class="node-sublabel">ConsoleRenderer dev</text>
+  <text x="750" y="780" text-anchor="middle" class="node-sublabel">Request ID middleware</text>
+  <text x="750" y="793" text-anchor="middle" class="node-sublabel">Timing · context binding</text>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <!-- CI/CD LAYER                                                               -->
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <rect x="880" y="665" width="705" height="150" rx="12" fill="#fefce8" stroke="#ca8a04" stroke-width="2" />
+  <text x="890" y="686" class="section-label" fill="#92400e" style="font-size:13px">🚀  GitHub Actions CI/CD Pipelines</text>
+
+  <!-- CI -->
+  <rect x="895" y="695" width="110" height="105" rx="8" fill="url(#grad-yellow)" stroke="#ca8a04" stroke-width="1.5" filter="url(#shadow)" />
+  <text x="950" y="718" text-anchor="middle" style="font-size:14px">🔄</text>
+  <text x="950" y="734" text-anchor="middle" class="node-label" fill="#78350f">CI</text>
+  <text x="950" y="749" text-anchor="middle" class="node-sublabel">ruff · black · mypy</text>
+  <text x="950" y="764" text-anchor="middle" class="node-sublabel">pytest 70% cov</text>
+  <text x="950" y="779" text-anchor="middle" class="node-sublabel">codecov upload</text>
+  <text x="950" y="793" text-anchor="middle" class="node-sublabel">Slack notify</text>
+
+  <!-- Security Scan -->
+  <rect x="1018" y="695" width="115" height="105" rx="8" fill="url(#grad-yellow)" stroke="#ca8a04" stroke-width="1.5" filter="url(#shadow)" />
+  <text x="1075" y="718" text-anchor="middle" style="font-size:14px">🔒</text>
+  <text x="1075" y="734" text-anchor="middle" class="node-label" fill="#78350f">Security Scan</text>
+  <text x="1075" y="749" text-anchor="middle" class="node-sublabel">OWASP Dep Check</text>
+  <text x="1075" y="764" text-anchor="middle" class="node-sublabel">Semgrep SAST</text>
+  <text x="1075" y="779" text-anchor="middle" class="node-sublabel">Gitleaks · Bandit</text>
+  <text x="1075" y="793" text-anchor="middle" class="node-sublabel">CodeQL · ZAP</text>
+
+  <!-- Image Scan -->
+  <rect x="1146" y="695" width="115" height="105" rx="8" fill="url(#grad-yellow)" stroke="#ca8a04" stroke-width="1.5" filter="url(#shadow)" />
+  <text x="1203" y="718" text-anchor="middle" style="font-size:14px">🐳</text>
+  <text x="1203" y="734" text-anchor="middle" class="node-label" fill="#78350f">Image Scan</text>
+  <text x="1203" y="749" text-anchor="middle" class="node-sublabel">Trivy (SARIF)</text>
+  <text x="1203" y="764" text-anchor="middle" class="node-sublabel">Snyk container</text>
+  <text x="1203" y="779" text-anchor="middle" class="node-sublabel">Hadolint lint</text>
+  <text x="1203" y="793" text-anchor="middle" class="node-sublabel">Docker Scout</text>
+
+  <!-- CD Production -->
+  <rect x="1274" y="695" width="115" height="105" rx="8" fill="url(#grad-yellow)" stroke="#ca8a04" stroke-width="1.5" filter="url(#shadow)" />
+  <text x="1331" y="718" text-anchor="middle" style="font-size:14px">🚀</text>
+  <text x="1331" y="734" text-anchor="middle" class="node-label" fill="#78350f">CD Production</text>
+  <text x="1331" y="749" text-anchor="middle" class="node-sublabel">ECR push + sign</text>
+  <text x="1331" y="764" text-anchor="middle" class="node-sublabel">DB migration job</text>
+  <text x="1331" y="779" text-anchor="middle" class="node-sublabel">Helm --atomic</text>
+  <text x="1331" y="793" text-anchor="middle" class="node-sublabel">E2E smoke verify</text>
+
+  <!-- MLOps Pipeline -->
+  <rect x="1402" y="695" width="115" height="105" rx="8" fill="url(#grad-yellow)" stroke="#ca8a04" stroke-width="1.5" filter="url(#shadow)" />
+  <text x="1459" y="718" text-anchor="middle" style="font-size:14px">🧬</text>
+  <text x="1459" y="734" text-anchor="middle" class="node-label" fill="#78350f">MLOps Pipeline</text>
+  <text x="1459" y="749" text-anchor="middle" class="node-sublabel">Weekly schedule</text>
+  <text x="1459" y="764" text-anchor="middle" class="node-sublabel">Data validate</text>
+  <text x="1459" y="779" text-anchor="middle" class="node-sublabel">Train → Evaluate</text>
+  <text x="1459" y="793" text-anchor="middle" class="node-sublabel">Register model</text>
+
+  <!-- Terraform Pipeline -->
+  <rect x="1530" y="695" width="115" height="105" rx="8" fill="url(#grad-yellow)" stroke="#ca8a04" stroke-width="1.5" filter="url(#shadow)" />
+  <text x="1587" y="718" text-anchor="middle" style="font-size:14px">🏗️</text>
+  <text x="1587" y="734" text-anchor="middle" class="node-label" fill="#78350f">Terraform IaC</text>
+  <text x="1587" y="749" text-anchor="middle" class="node-sublabel">fmt · validate</text>
+  <text x="1587" y="764" text-anchor="middle" class="node-sublabel">tfsec · checkov</text>
+  <text x="1587" y="779" text-anchor="middle" class="node-sublabel">plan PR comment</text>
+  <text x="1587" y="793" text-anchor="middle" class="node-sublabel">apply on main</text>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <!-- BOTTOM INFO BAR                                                          -->
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <rect x="20" y="830" width="1565" height="90" rx="10" fill="#1e1b4b" />
+
+  <!-- Left: Tech Stack -->
+  <text x="35" y="854" style="font-size:11px;font-weight:700;fill:#a5b4fc">Tech Stack</text>
+  <text x="35" y="872" style="font-size:9.5px;fill:#c7d2fe">Python 3.11 · FastAPI · Pydantic v2 · SQLAlchemy async · asyncpg · aioredis · aiokafka</text>
+  <text x="35" y="888" style="font-size:9.5px;fill:#c7d2fe">Celery · structlog · Tenacity · python-jose · bcrypt · Prometheus Client · OpenTelemetry</text>
+  <text x="35" y="904" style="font-size:9.5px;fill:#c7d2fe">XGBoost · scikit-learn · MLflow · NumPy · pandas · locust (load testing)</text>
+
+  <!-- Middle: AWS Services -->
+  <text x="580" y="854" style="font-size:11px;font-weight:700;fill:#a5b4fc">AWS Services</text>
+  <text x="580" y="872" style="font-size:9.5px;fill:#c7d2fe">EKS 1.29 · Aurora PostgreSQL 15 · ElastiCache Redis 7 · MSK Kafka 3.5</text>
+  <text x="580" y="888" style="font-size:9.5px;fill:#c7d2fe">ALB · WAF · KMS · Secrets Manager · S3 · ECR · CloudWatch · VPC Flow Logs</text>
+  <text x="580" y="904" style="font-size:9.5px;fill:#c7d2fe">IAM IRSA · IMDSv2 · EBS gp3 encrypted · Multi-AZ · Auto Scaling</text>
+
+  <!-- Right: Security & Quality -->
+  <text x="1120" y="854" style="font-size:11px;font-weight:700;fill:#a5b4fc">Security &amp; Quality Gates</text>
+  <text x="1120" y="872" style="font-size:9.5px;fill:#c7d2fe">OWASP Top 10 · JWT RS256 · RBAC · TLS everywhere · HSTS · CSP · X-Frame-Options</text>
+  <text x="1120" y="888" style="font-size:9.5px;fill:#c7d2fe">Semgrep SAST · Gitleaks · Bandit · CodeQL · OWASP Dep Check · ZAP API scan</text>
+  <text x="1120" y="904" style="font-size:9.5px;fill:#c7d2fe">Trivy · Snyk · Hadolint · ReadOnlyRootFS · Drop ALL caps · NonRoot UID 1000</text>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <!-- LEGEND                                                                   -->
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <rect x="20" y="935" width="1565" height="55" rx="10" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1" />
+  <text x="35" y="955" style="font-size:10px;font-weight:700;fill:#475569">Legend:</text>
+
+  <line x1="110" y1="950" x2="160" y2="950" stroke="#2563eb" stroke-width="2" marker-end="url(#arrow-blue)" />
+  <text x="168" y="954" style="font-size:9px;fill:#475569">Sync call</text>
+
+  <line x1="245" y1="950" x2="295" y2="950" stroke="#2563eb" stroke-width="2" stroke-dasharray="5,3" marker-end="url(#arrow-blue)" />
+  <text x="303" y="954" style="font-size:9px;fill:#475569">Async / event</text>
+
+  <line x1="405" y1="950" x2="455" y2="950" stroke="#7c3aed" stroke-width="2" stroke-dasharray="5,3" marker-end="url(#arrow-purple)" />
+  <text x="463" y="954" style="font-size:9px;fill:#475569">LLM API call</text>
+
+  <line x1="555" y1="950" x2="605" y2="950" stroke="#059669" stroke-width="2" stroke-dasharray="5,3" marker-end="url(#arrow-green)" />
+  <text x="613" y="954" style="font-size:9px;fill:#475569">ML/model call</text>
+
+  <!-- Color swatches -->
+  <rect x="720" y="942" width="14" height="14" rx="3" fill="#ede9fe" stroke="#7c3aed" stroke-width="1" />
+  <text x="740" y="954" style="font-size:9px;fill:#475569">AI Agents</text>
+
+  <rect x="820" y="942" width="14" height="14" rx="3" fill="#fefce8" stroke="#ca8a04" stroke-width="1" />
+  <text x="840" y="954" style="font-size:9px;fill:#475569">Specialized Agents</text>
+
+  <rect x="960" y="942" width="14" height="14" rx="3" fill="#dcfce7" stroke="#16a34a" stroke-width="1" />
+  <text x="980" y="954" style="font-size:9px;fill:#475569">Application / ML</text>
+
+  <rect x="1085" y="942" width="14" height="14" rx="3" fill="#ffedd5" stroke="#f97316" stroke-width="1" />
+  <text x="1105" y="954" style="font-size:9px;fill:#475569">AWS Services</text>
+
+  <rect x="1195" y="942" width="14" height="14" rx="3" fill="#dbeafe" stroke="#3b82f6" stroke-width="1" />
+  <text x="1215" y="954" style="font-size:9px;fill:#475569">Compute / Data</text>
+
+  <text x="1340" y="954" style="font-size:9px;fill:#94a3b8">EKS boundary: ········</text>
+
+  <!-- Footer -->
+  <text x="800" y="980" text-anchor="middle" style="font-size:9px;fill:#94a3b8">
+    Supply Chain AI Platform · Claude Opus 4.6 · Multi-Agent Orchestration · Production Grade · © 2024
+  </text>
+  <text x="800" y="994" text-anchor="middle" style="font-size:9px;fill:#94a3b8">
+    Edit this diagram: open supply-chain-architecture.drawio in diagrams.net (draw.io)
+  </text>
+
+</svg>

@@ -1,0 +1,168 @@
+global:
+  resolve_timeout: 5m
+  slack_api_url: "${SLACK_WEBHOOK_URL}"
+  smtp_from: "alertmanager@supply-chain.internal"
+  smtp_smarthost: "smtp.internal:587"
+  smtp_auth_username: "alertmanager"
+  smtp_auth_password: "${SMTP_PASSWORD}"
+
+# ── Templates ─────────────────────────────────────────────────────────────────
+templates:
+  - "/etc/alertmanager/templates/*.tmpl"
+
+# ── Routing ───────────────────────────────────────────────────────────────────
+route:
+  group_by: ["alertname", "service", "cluster"]
+  group_wait: 30s
+  group_interval: 5m
+  repeat_interval: 4h
+  receiver: slack-default
+
+  routes:
+    # Critical alerts → immediate Slack + PagerDuty
+    - match:
+        severity: critical
+      receiver: slack-critical
+      continue: true
+      group_wait: 10s
+      repeat_interval: 1h
+
+    # PagerDuty for critical + pagerduty=true
+    - match_re:
+        severity: critical
+      match:
+        pagerduty: "true"
+      receiver: pagerduty-critical
+      continue: false
+
+    # ML/AI specific alerts
+    - match:
+        team: ml
+      receiver: slack-ml
+      group_wait: 1m
+      repeat_interval: 6h
+
+    # Platform/infra alerts
+    - match:
+        team: platform
+      receiver: slack-platform
+      group_wait: 30s
+      repeat_interval: 4h
+
+    # Watchdog (always firing heartbeat alert)
+    - match:
+        alertname: Watchdog
+      receiver: "null"
+
+# ── Inhibit Rules ─────────────────────────────────────────────────────────────
+inhibit_rules:
+  # If API is down, suppress latency/error rate alerts
+  - source_match:
+      alertname: APIDown
+    target_match_re:
+      alertname: "API.*"
+    equal: ["cluster"]
+
+  # If node is down, suppress pod alerts on that node
+  - source_match:
+      alertname: KubeNodeNotReady
+    target_match:
+      alertname: KubePodCrashLooping
+    equal: ["node"]
+
+  # Critical inhibits warning for same alert
+  - source_match:
+      severity: critical
+    target_match:
+      severity: warning
+    equal: ["alertname", "service", "cluster"]
+
+# ── Receivers ─────────────────────────────────────────────────────────────────
+receivers:
+  - name: "null"
+
+  - name: slack-default
+    slack_configs:
+      - channel: "#alerts-general"
+        send_resolved: true
+        icon_url: "https://avatars3.githubusercontent.com/u/3380462"
+        title: |-
+          [{{ .Status | toUpper }}{{ if eq .Status "firing" }}:{{ .Alerts.Firing | len }}{{ end }}] {{ .CommonLabels.alertname }}
+        text: >-
+          {{ range .Alerts }}
+            *Alert:* {{ .Annotations.summary }} — `{{ .Labels.severity }}`
+            *Description:* {{ .Annotations.description }}
+            *Service:* {{ .Labels.service }}
+            {{ if .Annotations.runbook_url }}*Runbook:* <{{ .Annotations.runbook_url }}|View Runbook>{{ end }}
+          {{ end }}
+        actions:
+          - type: button
+            text: "View in Grafana"
+            url: "http://grafana:3000/alerting"
+          - type: button
+            text: "View in Prometheus"
+            url: "http://prometheus:9090/alerts"
+
+  - name: slack-critical
+    slack_configs:
+      - channel: "#alerts-critical"
+        send_resolved: true
+        icon_emoji: ":fire:"
+        color: '{{ if eq .Status "firing" }}danger{{ else }}good{{ end }}'
+        title: |-
+          {{ if eq .Status "firing" }}🔥 CRITICAL{{ else }}✅ RESOLVED{{ end }}: {{ .CommonLabels.alertname }}
+        text: >-
+          {{ range .Alerts }}
+            *Alert:* {{ .Annotations.summary }}
+            *Description:* {{ .Annotations.description }}
+            *Service:* `{{ .Labels.service }}` | *Cluster:* `{{ .Labels.cluster }}`
+            *Started:* {{ .StartsAt | since | humanizeDuration }} ago
+            {{ if .Annotations.runbook_url }}*Runbook:* <{{ .Annotations.runbook_url }}|View Runbook>{{ end }}
+          {{ end }}
+        actions:
+          - type: button
+            text: "🔍 Investigate"
+            url: "http://grafana:3000/alerting"
+            style: danger
+          - type: button
+            text: "📖 Runbook"
+            url: "{{ (index .Alerts 0).Annotations.runbook_url }}"
+
+  - name: slack-ml
+    slack_configs:
+      - channel: "#alerts-ml"
+        send_resolved: true
+        icon_emoji: ":robot_face:"
+        title: |-
+          [ML/AI {{ .Status | toUpper }}] {{ .CommonLabels.alertname }}
+        text: >-
+          {{ range .Alerts }}
+            *Alert:* {{ .Annotations.summary }}
+            *Description:* {{ .Annotations.description }}
+          {{ end }}
+
+  - name: slack-platform
+    slack_configs:
+      - channel: "#alerts-platform"
+        send_resolved: true
+        icon_emoji: ":warning:"
+        title: |-
+          [Platform {{ .Status | toUpper }}] {{ .CommonLabels.alertname }}
+        text: >-
+          {{ range .Alerts }}
+            *Alert:* {{ .Annotations.summary }}
+            *Description:* {{ .Annotations.description }}
+            *Service:* `{{ .Labels.service }}`
+          {{ end }}
+
+  - name: pagerduty-critical
+    pagerduty_configs:
+      - routing_key: "${PAGERDUTY_ROUTING_KEY}"
+        description: "{{ .CommonAnnotations.summary }}"
+        severity: '{{ .CommonLabels.severity }}'
+        details:
+          alertname: "{{ .CommonLabels.alertname }}"
+          service: "{{ .CommonLabels.service }}"
+          cluster: "{{ .CommonLabels.cluster }}"
+          description: "{{ .CommonAnnotations.description }}"
+          runbook_url: "{{ .CommonAnnotations.runbook_url }}"

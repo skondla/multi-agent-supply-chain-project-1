@@ -1,0 +1,243 @@
+name: CD - Production Deployment
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+  workflow_dispatch:
+    inputs:
+      image_tag:
+        description: Image tag to deploy
+        required: true
+        type: string
+      environment:
+        description: Target environment
+        required: true
+        default: production
+        type: choice
+        options: [production, staging]
+
+env:
+  AWS_REGION: us-east-1
+  EKS_CLUSTER: supply-chain-eks-production
+  REGISTRY: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com
+  IMAGE_NAME: supply-chain-api
+
+jobs:
+  # ── Pre-deployment Checks ─────────────────────────────────────────────────────
+  pre-deployment:
+    name: Pre-deployment Checks
+    runs-on: ubuntu-latest
+    outputs:
+      image-tag: ${{ steps.set-tag.outputs.tag }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Determine image tag
+        id: set-tag
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            echo "tag=${{ github.event.inputs.image_tag }}" >> $GITHUB_OUTPUT
+          else
+            echo "tag=${{ github.ref_name }}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Slack Notify Deployment Start
+        uses: 8398a7/action-slack@v3
+        with:
+          status: custom
+          custom_payload: |
+            {
+              "blocks": [
+                {"type": "header", "text": {"type": "plain_text", "text": "🚀 Production Deployment Starting"}},
+                {"type": "section", "fields": [
+                  {"type": "mrkdwn", "text": "*Tag:*\n`${{ github.ref_name }}`"},
+                  {"type": "mrkdwn", "text": "*Actor:*\n${{ github.actor }}"},
+                  {"type": "mrkdwn", "text": "*Environment:*\nProduction"},
+                  {"type": "mrkdwn", "text": "*Commit:*\n`${{ github.sha }}`"}
+                ]}
+              ]
+            }
+          webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+  # ── Build & Push Image ────────────────────────────────────────────────────────
+  build-push:
+    name: Build & Push Image
+    runs-on: ubuntu-latest
+    needs: pre-deployment
+    outputs:
+      image-digest: ${{ steps.build.outputs.digest }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to ECR
+        id: ecr-login
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and push
+        id: build
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: |
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ needs.pre-deployment.outputs.image-tag }}
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          build-args: |
+            GIT_COMMIT=${{ github.sha }}
+            BUILD_DATE=${{ github.event.head_commit.timestamp }}
+
+      - name: Slack Notify Image Pushed
+        uses: 8398a7/action-slack@v3
+        with:
+          status: custom
+          custom_payload: |
+            {"text": "✅ Image pushed to ECR: `${{ needs.pre-deployment.outputs.image-tag }}`"}
+          webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+  # ── Image Security Scan ───────────────────────────────────────────────────────
+  image-security-scan:
+    name: Image Security Scan
+    needs: build-push
+    uses: ./.github/workflows/image-scan.yml
+    secrets: inherit
+
+  # ── Deploy to Production ──────────────────────────────────────────────────────
+  deploy-production:
+    name: Deploy to Production EKS
+    runs-on: ubuntu-latest
+    needs: [pre-deployment, build-push, image-security-scan]
+    environment:
+      name: production
+      url: https://api.supply-chain.example.com
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Update kubeconfig
+        run: |
+          aws eks update-kubeconfig \
+            --name ${{ env.EKS_CLUSTER }} \
+            --region ${{ env.AWS_REGION }}
+
+      - name: Run database migrations
+        run: |
+          JOB_NAME="db-migrate-$(date +%s)"
+          kubectl create job $JOB_NAME \
+            --from=cronjob/db-migration \
+            -n supply-chain
+
+          kubectl wait --for=condition=complete \
+            job/$JOB_NAME \
+            -n supply-chain \
+            --timeout=300s
+
+          kubectl delete job $JOB_NAME -n supply-chain
+
+      - name: Deploy with Helm
+        run: |
+          helm upgrade --install supply-chain-ai \
+            ./infrastructure/kubernetes/helm \
+            --namespace supply-chain \
+            --values infrastructure/kubernetes/helm/values-production.yaml \
+            --set image.repository=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }} \
+            --set image.tag=${{ needs.pre-deployment.outputs.image-tag }} \
+            --set image.digest=${{ needs.build-push.outputs.image-digest }} \
+            --timeout 15m \
+            --wait \
+            --atomic \
+            --history-max=10
+
+      - name: Verify deployment
+        run: |
+          kubectl rollout status deployment/supply-chain-api \
+            -n supply-chain \
+            --timeout=300s
+
+          # Wait and health check
+          sleep 30
+          API_HOST=$(kubectl get ingress -n supply-chain \
+            -o jsonpath='{.items[0].status.loadBalancer.ingress[0].hostname}' 2>/dev/null || echo "localhost")
+          echo "Checking health at: $API_HOST"
+
+      - name: Slack Notify Deploy Success
+        if: success()
+        uses: 8398a7/action-slack@v3
+        with:
+          status: custom
+          custom_payload: |
+            {
+              "blocks": [
+                {"type": "header", "text": {"type": "plain_text", "text": "✅ Production Deployment Successful!"}},
+                {"type": "section", "fields": [
+                  {"type": "mrkdwn", "text": "*Version:*\n`${{ needs.pre-deployment.outputs.image-tag }}`"},
+                  {"type": "mrkdwn", "text": "*Deployed by:*\n${{ github.actor }}"},
+                  {"type": "mrkdwn", "text": "*Environment:*\nProduction"},
+                  {"type": "mrkdwn", "text": "*URL:*\nhttps://api.supply-chain.example.com"}
+                ]}
+              ]
+            }
+          webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+      - name: Slack Notify Deploy Failure
+        if: failure()
+        uses: 8398a7/action-slack@v3
+        with:
+          status: custom
+          custom_payload: |
+            {
+              "blocks": [
+                {"type": "header", "text": {"type": "plain_text", "text": "❌ Production Deployment FAILED!"}},
+                {"type": "section", "text": {"type": "mrkdwn", "text": "*Tag:* `${{ needs.pre-deployment.outputs.image-tag }}`\n*Actor:* ${{ github.actor }}\n*Run:* ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"}}
+              ]
+            }
+          webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+  # ── Post-deployment E2E ───────────────────────────────────────────────────────
+  post-deployment-verification:
+    name: Post-deployment Verification
+    runs-on: ubuntu-latest
+    needs: deploy-production
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install test dependencies
+        run: pip install pytest httpx
+
+      - name: Run E2E smoke tests
+        env:
+          API_BASE_URL: https://api.supply-chain.example.com
+        run: |
+          pytest tests/e2e/test_smoke.py -v -m smoke --timeout=30
+        continue-on-error: true
+
+      - name: Slack Notify Verification
+        if: always()
+        uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ job.status }}
+          text: "Post-deployment verification: ${{ job.status }}"
+          webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}

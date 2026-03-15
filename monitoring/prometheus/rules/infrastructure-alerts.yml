@@ -1,0 +1,172 @@
+groups:
+  - name: kubernetes.rules
+    rules:
+      - alert: PodCrashLooping
+        expr: |
+          rate(kube_pod_container_status_restarts_total{namespace="supply-chain"}[15m]) * 60 * 5 > 3
+        for: 5m
+        labels:
+          severity: critical
+          team: platform
+        annotations:
+          summary: "Pod {{ $labels.pod }} is crash looping"
+          description: "Pod {{ $labels.namespace }}/{{ $labels.pod }} has restarted {{ $value }} times in 15 minutes."
+          runbook_url: "https://wiki.internal/runbooks/pod-crash-loop"
+          slack_channel: "#alerts-critical"
+
+      - alert: PodNotReady
+        expr: |
+          kube_pod_status_ready{namespace="supply-chain",condition="true"} == 0
+        for: 5m
+        labels:
+          severity: warning
+          team: platform
+        annotations:
+          summary: "Pod {{ $labels.pod }} not ready"
+          description: "Pod {{ $labels.namespace }}/{{ $labels.pod }} has been not ready for 5 minutes."
+
+      - alert: DeploymentReplicasMismatch
+        expr: |
+          kube_deployment_spec_replicas{namespace="supply-chain"}
+          != kube_deployment_status_available_replicas{namespace="supply-chain"}
+        for: 5m
+        labels:
+          severity: warning
+          team: platform
+        annotations:
+          summary: "Deployment {{ $labels.deployment }} replica mismatch"
+          description: "Deployment has {{ $value }} available replicas but wants more."
+
+      - alert: HPAScalingLimitReached
+        expr: |
+          kube_horizontalpodautoscaler_status_current_replicas{namespace="supply-chain"}
+          == kube_horizontalpodautoscaler_spec_max_replicas{namespace="supply-chain"}
+        for: 10m
+        labels:
+          severity: warning
+          team: platform
+        annotations:
+          summary: "HPA {{ $labels.horizontalpodautoscaler }} at max replicas"
+          description: "HPA has been at maximum replicas ({{ $value }}) for 10 minutes. Consider increasing limits."
+
+      - alert: NodeHighCPU
+        expr: |
+          100 - (avg by (node) (rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 85
+        for: 10m
+        labels:
+          severity: warning
+          team: platform
+        annotations:
+          summary: "Node {{ $labels.node }} CPU above 85%"
+          description: "Node CPU utilization is {{ $value | humanize }}%."
+
+      - alert: NodeHighMemory
+        expr: |
+          (1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100 > 85
+        for: 10m
+        labels:
+          severity: warning
+          team: platform
+        annotations:
+          summary: "Node {{ $labels.node }} memory above 85%"
+          description: "Node memory utilization is {{ $value | humanize }}%."
+
+      - alert: NodeDiskSpaceLow
+        expr: |
+          (1 - (node_filesystem_avail_bytes{mountpoint="/"} / node_filesystem_size_bytes{mountpoint="/"})) * 100 > 80
+        for: 5m
+        labels:
+          severity: warning
+          team: platform
+        annotations:
+          summary: "Node {{ $labels.instance }} disk above 80%"
+          description: "Disk usage is {{ $value | humanize }}% on {{ $labels.mountpoint }}."
+
+      - alert: NodeDiskSpaceCritical
+        expr: |
+          (1 - (node_filesystem_avail_bytes{mountpoint="/"} / node_filesystem_size_bytes{mountpoint="/"})) * 100 > 90
+        for: 2m
+        labels:
+          severity: critical
+          team: platform
+        annotations:
+          summary: "Node {{ $labels.instance }} disk above 90%"
+          description: "Disk usage critical at {{ $value | humanize }}%. Immediate cleanup required."
+          slack_channel: "#alerts-critical"
+
+  - name: redis.rules
+    rules:
+      - alert: RedisDown
+        expr: up{job="redis"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          team: platform
+          service: redis
+        annotations:
+          summary: "Redis is down"
+          description: "Redis cache has been unreachable for 1 minute. API caching degraded."
+          slack_channel: "#alerts-critical"
+
+      - alert: RedisHighMemory
+        expr: |
+          redis_memory_used_bytes / redis_memory_max_bytes > 0.85
+        for: 5m
+        labels:
+          severity: warning
+          team: platform
+          service: redis
+        annotations:
+          summary: "Redis memory above 85%"
+          description: "Redis memory usage is {{ $value | humanizePercentage }}. May start evicting keys."
+
+      - alert: RedisHighConnections
+        expr: redis_connected_clients > 200
+        for: 5m
+        labels:
+          severity: warning
+          team: platform
+          service: redis
+        annotations:
+          summary: "Redis has {{ $value }} connected clients"
+          description: "High number of Redis connections. Check for connection leaks."
+
+  - name: kafka.rules
+    rules:
+      - alert: KafkaConsumerLag
+        expr: |
+          sum(kafka_consumergroup_lag{topic=~"supply-chain.*"}) by (consumergroup, topic) > 10000
+        for: 5m
+        labels:
+          severity: warning
+          team: platform
+          service: kafka
+        annotations:
+          summary: "Kafka consumer lag high on {{ $labels.topic }}"
+          description: "Consumer group {{ $labels.consumergroup }} lag is {{ $value }} on {{ $labels.topic }}."
+          runbook_url: "https://wiki.internal/runbooks/kafka-consumer-lag"
+
+      - alert: KafkaConsumerLagCritical
+        expr: |
+          sum(kafka_consumergroup_lag{topic=~"supply-chain.*"}) by (consumergroup, topic) > 50000
+        for: 2m
+        labels:
+          severity: critical
+          team: platform
+          service: kafka
+        annotations:
+          summary: "Kafka consumer lag critical on {{ $labels.topic }}"
+          description: "Consumer group lag is {{ $value }}. Events severely delayed."
+          slack_channel: "#alerts-critical"
+
+      - alert: KafkaBrokerDown
+        expr: up{job="kafka"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          team: platform
+          service: kafka
+        annotations:
+          summary: "Kafka broker is down"
+          description: "Kafka broker has been unreachable for 1 minute. Event streaming disrupted."
+          slack_channel: "#alerts-critical"

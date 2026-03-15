@@ -1,0 +1,31 @@
+title = "Supply Chain AI - Gitleaks Configuration"
+
+[extend]
+useDefault = true
+
+[[rules]]
+description = "Anthropic API Key"
+id = "anthropic-api-key"
+regex = '''sk-ant-api[0-9a-zA-Z\-_]{40,}'''
+tags = ["anthropic", "llm", "key"]
+
+[[rules]]
+description = "Database URL with credentials"
+id = "database-url-credentials"
+regex = '''postgresql://[^:]+:[^@]+@'''
+tags = ["database", "credentials"]
+
+[allowlist]
+description = "Global allowlist"
+paths = [
+  ".env.example",
+  "tests/",
+  "docs/",
+]
+regexes = [
+  "sk-ant-your-key-here",
+  "your-secret-here",
+  "replace-with-actual",
+  "PLACEHOLDER",
+  "example.com",
+]

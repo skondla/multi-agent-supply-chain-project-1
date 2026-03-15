@@ -1,0 +1,273 @@
+name: Security Scans
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+  schedule:
+    - cron: '0 2 * * *'  # Daily at 2 AM UTC
+
+permissions:
+  contents: read
+  security-events: write
+  actions: read
+
+jobs:
+  # ── OWASP Dependency Check ────────────────────────────────────────────────────
+  owasp-dependency-check:
+    name: OWASP Dependency Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Slack Notify Security Scan Start
+        uses: 8398a7/action-slack@v3
+        with:
+          status: custom
+          custom_payload: |
+            {"text": "🔒 Security scan starting for `${{ github.repository }}`"}
+          webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+      - name: OWASP Dependency Check
+        uses: dependency-check/Dependency-Check_Action@main
+        id: depcheck
+        with:
+          project: supply-chain-ai
+          path: .
+          format: HTML,JSON,SARIF
+          args: >
+            --enableRetired
+            --failOnCVSS 8
+            --suppression .owasp-suppressions.xml
+
+      - name: Upload OWASP results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: owasp-results
+          path: reports/
+
+      - name: Upload SARIF to GitHub Security
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: reports/dependency-check-report.sarif
+        continue-on-error: true
+
+  # ── SAST with Semgrep ─────────────────────────────────────────────────────────
+  sast-semgrep:
+    name: SAST - Semgrep (OWASP Top 10)
+    runs-on: ubuntu-latest
+    container:
+      image: semgrep/semgrep:latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run Semgrep OWASP scan
+        run: |
+          semgrep scan \
+            --config=p/owasp-top-ten \
+            --config=p/python \
+            --config=p/fastapi \
+            --config=p/secrets \
+            --config=p/sql-injection \
+            --config=p/jwt \
+            --sarif-output=semgrep-results.sarif \
+            --json-output=semgrep-results.json \
+            --error \
+            --verbose || true
+
+      - name: Upload Semgrep SARIF
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: semgrep-results.sarif
+
+      - name: Upload Semgrep results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: semgrep-results
+          path: semgrep-results.json
+
+      - name: Slack Notify Semgrep Result
+        if: always()
+        uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ job.status }}
+          text: "Semgrep SAST scan ${{ job.status }} for `${{ github.repository }}`"
+          webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+  # ── Secret Scanning ───────────────────────────────────────────────────────────
+  secret-scanning:
+    name: Secret Scanning - Gitleaks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Full history for git log scanning
+
+      - name: Gitleaks secret scan
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Slack Notify Secret Found
+        if: failure()
+        uses: 8398a7/action-slack@v3
+        with:
+          status: custom
+          custom_payload: |
+            {
+              "blocks": [{
+                "type": "header",
+                "text": {"type": "plain_text", "text": "🚨 SECRET DETECTED!"}
+              },{
+                "type": "section",
+                "text": {"type": "mrkdwn", "text": "A secret was detected in `${{ github.repository }}` on branch `${{ github.ref_name }}`.\n*IMMEDIATE ACTION REQUIRED*"}
+              }]
+            }
+          webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+  # ── Python Security - Bandit ──────────────────────────────────────────────────
+  bandit:
+    name: Python Security - Bandit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Bandit and Safety
+        run: pip install bandit[toml] safety
+
+      - name: Run Bandit
+        run: |
+          bandit -r app/ agents/ llmops/ aiops/ \
+            -f json \
+            -o bandit-results.json \
+            --severity-level medium \
+            --exclude tests/ || true
+
+      - name: Run Safety dependency check
+        run: |
+          safety check -r requirements.txt \
+            --json \
+            --output safety-results.json || true
+
+      - name: Upload Bandit results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: bandit-safety-results
+          path: |
+            bandit-results.json
+            safety-results.json
+
+  # ── CodeQL Analysis ───────────────────────────────────────────────────────────
+  codeql:
+    name: CodeQL Analysis
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: python
+          queries: security-and-quality
+
+      - name: Autobuild
+        uses: github/codeql-action/autobuild@v3
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+        with:
+          category: /language:python
+
+      - name: Slack Notify CodeQL
+        if: always()
+        uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ job.status }}
+          text: "CodeQL analysis ${{ job.status }} for `${{ github.repository }}`"
+          webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+  # ── OWASP ZAP API Scan ────────────────────────────────────────────────────────
+  owasp-zap-scan:
+    name: OWASP ZAP API Scan
+    runs-on: ubuntu-latest
+    if: github.event_name == 'schedule' || github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Start application for scanning
+        run: |
+          docker-compose up -d api postgres redis
+          # Wait for app to be ready
+          timeout 120 bash -c 'until curl -sf http://localhost:8000/health; do sleep 3; done'
+
+      - name: Run OWASP ZAP API scan
+        uses: zaproxy/action-api-scan@v0.7.0
+        with:
+          target: http://localhost:8000/api/openapi.json
+          format: openapi
+          rules_file_name: security/owasp-zap-rules.tsv
+          cmd_options: '-a -j'
+          allow_issue_writing: false
+
+      - name: Upload ZAP report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: zap-report
+          path: report_html.html
+
+      - name: Stop application
+        if: always()
+        run: docker-compose down -v
+
+      - name: Slack Notify ZAP Scan
+        if: always()
+        uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ job.status }}
+          text: "OWASP ZAP API scan ${{ job.status }}"
+          webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+  # ── Security Summary ──────────────────────────────────────────────────────────
+  security-summary:
+    name: Security Summary
+    runs-on: ubuntu-latest
+    needs: [owasp-dependency-check, sast-semgrep, secret-scanning, bandit, codeql]
+    if: always()
+    steps:
+      - name: Slack Security Summary
+        uses: 8398a7/action-slack@v3
+        with:
+          status: custom
+          custom_payload: |
+            {
+              "blocks": [{
+                "type": "header",
+                "text": {"type": "plain_text", "text": "🛡️ Security Scan Summary"}
+              },{
+                "type": "section",
+                "fields": [
+                  {"type": "mrkdwn", "text": "*OWASP Dep:*\n${{ needs.owasp-dependency-check.result }}"},
+                  {"type": "mrkdwn", "text": "*Semgrep:*\n${{ needs.sast-semgrep.result }}"},
+                  {"type": "mrkdwn", "text": "*Secrets:*\n${{ needs.secret-scanning.result }}"},
+                  {"type": "mrkdwn", "text": "*Bandit:*\n${{ needs.bandit.result }}"},
+                  {"type": "mrkdwn", "text": "*CodeQL:*\n${{ needs.codeql.result }}"}
+                ]
+              }]
+            }
+          webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}

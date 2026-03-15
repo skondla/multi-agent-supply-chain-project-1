@@ -1,0 +1,867 @@
+openapi: "3.1.0"
+info:
+  title: Supply Chain AI Platform API
+  description: |
+    Production-grade multi-agent AI supply chain orchestration API powered by Claude Opus 4.6.
+
+    ## Features
+    - **Multi-Agent Orchestration**: 7 specialized AI agents coordinated by Claude Opus 4.6
+    - **Real-time Inventory Management**: Stock tracking with automated reorder recommendations
+    - **Order Processing**: End-to-end order lifecycle with fraud detection
+    - **Supplier Management**: Vendor evaluation and RFQ generation
+    - **Demand Forecasting**: ML-based predictions using XGBoost
+    - **Anomaly Detection**: Real-time fraud and anomaly scoring
+
+    ## Authentication
+    All endpoints require JWT Bearer token authentication (except `/health`, `/ready`, and `/api/v1/auth/token`).
+
+    ```
+    Authorization: Bearer <your-jwt-token>
+    ```
+
+    Obtain tokens via `POST /api/v1/auth/token` (OAuth2 password flow).
+
+    ## Rate Limiting
+    - 100 requests/minute per authenticated user
+    - 1000 requests/hour per authenticated user
+    - Agent orchestration: 10 requests/minute per user
+  version: "1.0.0"
+  contact:
+    name: Platform Team
+    email: platform@supply-chain.internal
+  license:
+    name: Proprietary
+    url: https://supply-chain.internal/license
+
+servers:
+  - url: http://localhost:8000
+    description: Local Development
+  - url: https://api.supply-chain.internal
+    description: Production
+
+security:
+  - BearerAuth: []
+
+tags:
+  - name: Health
+    description: Health and readiness endpoints
+  - name: Authentication
+    description: JWT authentication and user management
+  - name: Orders
+    description: Order management and processing
+  - name: Inventory
+    description: Inventory tracking and reorder management
+  - name: Suppliers
+    description: Supplier evaluation and management
+  - name: Shipments
+    description: Shipment tracking and logistics
+  - name: Agents
+    description: AI agent orchestration endpoints
+  - name: Analytics
+    description: Business intelligence and demand forecasting
+
+paths:
+  /health:
+    get:
+      tags: [Health]
+      summary: Health check
+      description: Returns application health status. Does not require authentication.
+      security: []
+      operationId: health_check
+      responses:
+        "200":
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: healthy
+                  version:
+                    type: string
+                    example: "1.0.0"
+                  timestamp:
+                    type: string
+                    format: date-time
+
+  /ready:
+    get:
+      tags: [Health]
+      summary: Readiness check
+      description: Checks all dependencies (DB, Redis, Kafka). Returns 503 if any dependency is unhealthy.
+      security: []
+      operationId: readiness_check
+      responses:
+        "200":
+          description: All dependencies healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: ready
+                  checks:
+                    type: object
+                    properties:
+                      database: {type: string, example: healthy}
+                      redis: {type: string, example: healthy}
+                      kafka: {type: string, example: healthy}
+        "503":
+          description: One or more dependencies unhealthy
+
+  /api/v1/auth/token:
+    post:
+      tags: [Authentication]
+      summary: Get access token
+      description: OAuth2 password flow. Returns JWT access and refresh tokens.
+      security: []
+      operationId: login_for_access_token
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              required: [username, password]
+              properties:
+                username:
+                  type: string
+                  example: admin@supply-chain.local
+                password:
+                  type: string
+                  format: password
+      responses:
+        "200":
+          description: Successful authentication
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TokenResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /api/v1/auth/register:
+    post:
+      tags: [Authentication]
+      summary: Register new user
+      operationId: register_user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserCreate"
+      responses:
+        "201":
+          description: User created successfully
+        "409":
+          description: Email or username already exists
+
+  /api/v1/auth/me:
+    get:
+      tags: [Authentication]
+      summary: Get current user
+      operationId: get_current_user
+      responses:
+        "200":
+          description: Current user details
+
+  /api/v1/orders:
+    get:
+      tags: [Orders]
+      summary: List orders
+      operationId: list_orders
+      parameters:
+        - name: page
+          in: query
+          schema: {type: integer, default: 1, minimum: 1}
+        - name: page_size
+          in: query
+          schema: {type: integer, default: 20, minimum: 1, maximum: 100}
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [pending, confirmed, processing, allocated, picking, packing, shipped, delivered, cancelled, returned, refunded]
+        - name: search
+          in: query
+          schema: {type: string}
+          description: Search by customer name, email, or order number
+      responses:
+        "200":
+          description: Paginated order list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OrderListResponse"
+
+    post:
+      tags: [Orders]
+      summary: Create order
+      operationId: create_order
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OrderCreate"
+      responses:
+        "201":
+          description: Order created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OrderResponse"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+
+  /api/v1/orders/{order_id}:
+    get:
+      tags: [Orders]
+      summary: Get order by ID
+      operationId: get_order
+      parameters:
+        - $ref: "#/components/parameters/OrderId"
+      responses:
+        "200":
+          description: Order details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OrderResponse"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+    put:
+      tags: [Orders]
+      summary: Update order
+      operationId: update_order
+      parameters:
+        - $ref: "#/components/parameters/OrderId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OrderUpdate"
+      responses:
+        "200":
+          description: Order updated
+
+    delete:
+      tags: [Orders]
+      summary: Cancel order
+      operationId: cancel_order
+      parameters:
+        - $ref: "#/components/parameters/OrderId"
+      responses:
+        "200":
+          description: Order cancelled
+        "409":
+          description: Order cannot be cancelled in current status
+
+  /api/v1/orders/{order_id}/process:
+    post:
+      tags: [Orders]
+      summary: Process order through AI agents
+      operationId: process_order
+      description: |
+        Triggers multi-agent orchestration for order processing.
+        Returns 202 Accepted immediately; use the task_id to poll for results.
+      parameters:
+        - $ref: "#/components/parameters/OrderId"
+      responses:
+        "202":
+          description: Order processing initiated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  task_id: {type: string}
+                  status: {type: string, example: processing}
+                  poll_url: {type: string}
+
+  /api/v1/orders/bulk:
+    post:
+      tags: [Orders]
+      summary: Create multiple orders
+      operationId: bulk_create_orders
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                orders:
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/OrderCreate"
+                  maxItems: 100
+      responses:
+        "207":
+          description: Multi-status response
+
+  /api/v1/inventory:
+    get:
+      tags: [Inventory]
+      summary: List inventory items
+      operationId: list_inventory
+      parameters:
+        - name: page
+          in: query
+          schema: {type: integer, default: 1}
+        - name: page_size
+          in: query
+          schema: {type: integer, default: 20}
+        - name: category
+          in: query
+          schema: {type: string}
+        - name: low_stock_only
+          in: query
+          schema: {type: boolean, default: false}
+          description: Return only items at or below reorder point
+      responses:
+        "200":
+          description: Inventory list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InventoryListResponse"
+
+    post:
+      tags: [Inventory]
+      summary: Create inventory item
+      operationId: create_inventory_item
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/InventoryCreate"
+      responses:
+        "201":
+          description: Inventory item created
+
+  /api/v1/inventory/low-stock:
+    get:
+      tags: [Inventory]
+      summary: Get low stock items
+      operationId: get_low_stock_items
+      responses:
+        "200":
+          description: Items at or below reorder point
+
+  /api/v1/inventory/{sku}:
+    get:
+      tags: [Inventory]
+      summary: Get inventory item by SKU
+      operationId: get_inventory_item
+      parameters:
+        - name: sku
+          in: path
+          required: true
+          schema: {type: string}
+      responses:
+        "200":
+          description: Inventory item details
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /api/v1/inventory/{sku}/adjust:
+    post:
+      tags: [Inventory]
+      summary: Adjust inventory quantity
+      operationId: adjust_inventory
+      parameters:
+        - name: sku
+          in: path
+          required: true
+          schema: {type: string}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/InventoryAdjustment"
+      responses:
+        "200":
+          description: Inventory adjusted
+
+  /api/v1/inventory/reorder:
+    post:
+      tags: [Inventory]
+      summary: Trigger reorder for low stock items
+      operationId: trigger_reorder
+      responses:
+        "202":
+          description: Reorder initiated
+
+  /api/v1/suppliers:
+    get:
+      tags: [Suppliers]
+      summary: List suppliers
+      operationId: list_suppliers
+      responses:
+        "200":
+          description: Supplier list
+
+    post:
+      tags: [Suppliers]
+      summary: Create supplier
+      operationId: create_supplier
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SupplierCreate"
+      responses:
+        "201":
+          description: Supplier created
+
+  /api/v1/suppliers/{supplier_id}/evaluate:
+    post:
+      tags: [Suppliers]
+      summary: Evaluate supplier using AI agent
+      operationId: evaluate_supplier
+      parameters:
+        - name: supplier_id
+          in: path
+          required: true
+          schema: {type: string, format: uuid}
+      responses:
+        "200":
+          description: Supplier evaluation complete
+
+  /api/v1/shipments:
+    get:
+      tags: [Shipments]
+      summary: List shipments
+      operationId: list_shipments
+      responses:
+        "200":
+          description: Shipment list
+
+  /api/v1/shipments/track/{tracking_number}:
+    get:
+      tags: [Shipments]
+      summary: Track shipment
+      operationId: track_shipment
+      parameters:
+        - name: tracking_number
+          in: path
+          required: true
+          schema: {type: string}
+      responses:
+        "200":
+          description: Shipment tracking info
+
+  /api/v1/agents/orchestrate:
+    post:
+      tags: [Agents]
+      summary: Orchestrate a multi-agent task
+      operationId: orchestrate_task
+      description: |
+        Submit a task for multi-agent orchestration. Returns task_id for polling.
+        The orchestrator agent will route to appropriate specialized agents.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OrchestrationRequest"
+      responses:
+        "202":
+          description: Task accepted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OrchestrationResponse"
+
+  /api/v1/agents/tasks/{task_id}:
+    get:
+      tags: [Agents]
+      summary: Get task status
+      operationId: get_task_status
+      parameters:
+        - name: task_id
+          in: path
+          required: true
+          schema: {type: string}
+      responses:
+        "200":
+          description: Task status and result
+
+  /api/v1/agents/status:
+    get:
+      tags: [Agents]
+      summary: Get all agents status
+      operationId: get_agents_status
+      responses:
+        "200":
+          description: Status of all 7 agents
+
+  /api/v1/analytics/dashboard:
+    get:
+      tags: [Analytics]
+      summary: Get KPI dashboard metrics
+      operationId: get_dashboard_metrics
+      responses:
+        "200":
+          description: KPI metrics
+
+  /api/v1/analytics/demand-forecast:
+    get:
+      tags: [Analytics]
+      summary: Get demand forecast
+      operationId: get_demand_forecast
+      parameters:
+        - name: product_id
+          in: query
+          schema: {type: string}
+        - name: horizon_days
+          in: query
+          schema: {type: integer, default: 30}
+      responses:
+        "200":
+          description: Demand forecast with confidence intervals
+
+  /api/v1/analytics/anomalies:
+    get:
+      tags: [Analytics]
+      summary: Get anomaly detection report
+      operationId: get_anomalies
+      responses:
+        "200":
+          description: Detected anomalies
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  parameters:
+    OrderId:
+      name: order_id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+
+  responses:
+    Unauthorized:
+      description: Invalid or missing authentication token
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    ValidationError:
+      description: Request validation failed
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ValidationErrorResponse"
+
+  schemas:
+    ErrorResponse:
+      type: object
+      properties:
+        detail:
+          type: string
+
+    ValidationErrorResponse:
+      type: object
+      properties:
+        detail:
+          type: array
+          items:
+            type: object
+            properties:
+              loc: {type: array, items: {type: string}}
+              msg: {type: string}
+              type: {type: string}
+
+    TokenResponse:
+      type: object
+      properties:
+        access_token:
+          type: string
+        refresh_token:
+          type: string
+        token_type:
+          type: string
+          example: bearer
+        expires_in:
+          type: integer
+          example: 1800
+
+    UserCreate:
+      type: object
+      required: [email, username, password]
+      properties:
+        email:
+          type: string
+          format: email
+        username:
+          type: string
+          minLength: 3
+        password:
+          type: string
+          minLength: 8
+        full_name:
+          type: string
+
+    OrderItem:
+      type: object
+      required: [sku, quantity, unit_price]
+      properties:
+        sku:
+          type: string
+        name:
+          type: string
+        quantity:
+          type: integer
+          minimum: 1
+        unit_price:
+          type: number
+          minimum: 0
+
+    Address:
+      type: object
+      properties:
+        street:
+          type: string
+        city:
+          type: string
+        state:
+          type: string
+        postal_code:
+          type: string
+        country:
+          type: string
+          default: "US"
+
+    OrderCreate:
+      type: object
+      required: [customer_id, items]
+      properties:
+        customer_id:
+          type: string
+          format: uuid
+        customer_email:
+          type: string
+          format: email
+        customer_name:
+          type: string
+        priority:
+          type: string
+          enum: [low, standard, high, urgent]
+          default: standard
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/OrderItem"
+          minItems: 1
+        shipping_address:
+          $ref: "#/components/schemas/Address"
+        billing_address:
+          $ref: "#/components/schemas/Address"
+        notes:
+          type: string
+        requested_delivery_date:
+          type: string
+          format: date-time
+        currency:
+          type: string
+          default: "USD"
+
+    OrderUpdate:
+      type: object
+      properties:
+        status:
+          type: string
+        notes:
+          type: string
+        priority:
+          type: string
+
+    OrderResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        order_number:
+          type: string
+        customer_id:
+          type: string
+          format: uuid
+        customer_email:
+          type: string
+        customer_name:
+          type: string
+        status:
+          type: string
+        priority:
+          type: string
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/OrderItem"
+        subtotal:
+          type: number
+        tax_amount:
+          type: number
+        shipping_cost:
+          type: number
+        total_amount:
+          type: number
+        currency:
+          type: string
+        fraud_score:
+          type: number
+          description: "0.0-1.0, where >0.7 indicates high fraud risk"
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    OrderListResponse:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/OrderResponse"
+        total:
+          type: integer
+        page:
+          type: integer
+        page_size:
+          type: integer
+        pages:
+          type: integer
+
+    InventoryCreate:
+      type: object
+      required: [sku, name, unit_cost]
+      properties:
+        sku:
+          type: string
+        name:
+          type: string
+        category:
+          type: string
+        unit_cost:
+          type: number
+          minimum: 0
+        unit_price:
+          type: number
+        quantity_on_hand:
+          type: integer
+          minimum: 0
+          default: 0
+        reorder_point:
+          type: integer
+          default: 10
+        reorder_quantity:
+          type: integer
+          default: 50
+        warehouse_location:
+          type: string
+
+    InventoryAdjustment:
+      type: object
+      required: [quantity_delta, reason]
+      properties:
+        quantity_delta:
+          type: integer
+          description: "Positive to add, negative to remove"
+        reason:
+          type: string
+          enum: [purchase, sale, damaged, returned, audit, transfer]
+        notes:
+          type: string
+
+    InventoryListResponse:
+      type: object
+      properties:
+        items:
+          type: array
+        total:
+          type: integer
+        page:
+          type: integer
+        page_size:
+          type: integer
+
+    SupplierCreate:
+      type: object
+      required: [name, code]
+      properties:
+        name:
+          type: string
+        code:
+          type: string
+        email:
+          type: string
+          format: email
+        country:
+          type: string
+        lead_time_days:
+          type: integer
+          default: 7
+        payment_terms:
+          type: integer
+          default: 30
+
+    OrchestrationRequest:
+      type: object
+      required: [task_description]
+      properties:
+        task_description:
+          type: string
+          maxLength: 5000
+        task_type:
+          type: string
+          enum: [process_order, check_inventory, evaluate_supplier, route_shipment, analyze_demand, detect_anomaly, general]
+          default: general
+        priority:
+          type: string
+          enum: [low, normal, high, critical]
+          default: normal
+        context:
+          type: object
+          description: Additional context for the agent
+        metadata:
+          type: object
+
+    OrchestrationResponse:
+      type: object
+      properties:
+        task_id:
+          type: string
+        status:
+          type: string
+          example: processing
+        estimated_completion_seconds:
+          type: integer
+        poll_url:
+          type: string

@@ -1,0 +1,209 @@
+groups:
+  - name: api.rules
+    interval: 30s
+    rules:
+      # ── Availability ──────────────────────────────────────────────────────────
+      - alert: APIHighErrorRate
+        expr: |
+          (
+            sum(rate(http_requests_total{job="supply-chain-api",status=~"5.."}[5m]))
+            /
+            sum(rate(http_requests_total{job="supply-chain-api"}[5m]))
+          ) > 0.05
+        for: 2m
+        labels:
+          severity: critical
+          team: platform
+          service: api
+        annotations:
+          summary: "API error rate above 5%"
+          description: "Error rate is {{ $value | humanizePercentage }} over the last 5 minutes. Investigate immediately."
+          runbook_url: "https://wiki.internal/runbooks/api-high-error-rate"
+          slack_channel: "#alerts-critical"
+
+      - alert: APIHighErrorRateWarning
+        expr: |
+          (
+            sum(rate(http_requests_total{job="supply-chain-api",status=~"5.."}[5m]))
+            /
+            sum(rate(http_requests_total{job="supply-chain-api"}[5m]))
+          ) > 0.01
+        for: 5m
+        labels:
+          severity: warning
+          team: platform
+          service: api
+        annotations:
+          summary: "API error rate above 1%"
+          description: "Error rate is {{ $value | humanizePercentage }}. Monitor closely."
+          runbook_url: "https://wiki.internal/runbooks/api-high-error-rate"
+
+      - alert: APIDown
+        expr: up{job="supply-chain-api"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          team: platform
+          service: api
+          pagerduty: "true"
+        annotations:
+          summary: "API is down"
+          description: "Supply Chain API has been unreachable for 1 minute."
+          runbook_url: "https://wiki.internal/runbooks/api-down"
+          slack_channel: "#alerts-critical"
+
+      # ── Latency ───────────────────────────────────────────────────────────────
+      - alert: APIHighLatency
+        expr: |
+          histogram_quantile(0.95,
+            sum(rate(http_request_duration_seconds_bucket{job="supply-chain-api"}[5m])) by (le, endpoint)
+          ) > 2.0
+        for: 5m
+        labels:
+          severity: warning
+          team: platform
+          service: api
+        annotations:
+          summary: "API p95 latency above 2s"
+          description: "p95 latency on {{ $labels.endpoint }} is {{ $value | humanizeDuration }}."
+          runbook_url: "https://wiki.internal/runbooks/api-high-latency"
+
+      - alert: APIHighLatencyCritical
+        expr: |
+          histogram_quantile(0.99,
+            sum(rate(http_request_duration_seconds_bucket{job="supply-chain-api"}[5m])) by (le)
+          ) > 5.0
+        for: 2m
+        labels:
+          severity: critical
+          team: platform
+          service: api
+        annotations:
+          summary: "API p99 latency above 5s"
+          description: "p99 latency is {{ $value | humanizeDuration }}. SLA breach imminent."
+          runbook_url: "https://wiki.internal/runbooks/api-high-latency"
+          slack_channel: "#alerts-critical"
+
+      # ── AI Agent Alerts ───────────────────────────────────────────────────────
+      - alert: AgentHighFailureRate
+        expr: |
+          (
+            sum(rate(agent_requests_total{status="error"}[5m])) by (agent_name)
+            /
+            sum(rate(agent_requests_total[5m])) by (agent_name)
+          ) > 0.10
+        for: 3m
+        labels:
+          severity: warning
+          team: ml
+          service: agents
+        annotations:
+          summary: "Agent {{ $labels.agent_name }} failure rate above 10%"
+          description: "Agent {{ $labels.agent_name }} has {{ $value | humanizePercentage }} failure rate."
+          runbook_url: "https://wiki.internal/runbooks/agent-failures"
+
+      - alert: AgentHighLatency
+        expr: |
+          histogram_quantile(0.95,
+            sum(rate(agent_latency_seconds_bucket[5m])) by (le, agent_name)
+          ) > 30.0
+        for: 5m
+        labels:
+          severity: warning
+          team: ml
+          service: agents
+        annotations:
+          summary: "Agent {{ $labels.agent_name }} p95 latency above 30s"
+          description: "Agent latency is {{ $value | humanizeDuration }}. May be throttled by Anthropic API."
+
+      - alert: AgentTokenBudgetExceeded
+        expr: |
+          sum(rate(agent_tokens_total[1h])) by (agent_name) > 500000
+        for: 0m
+        labels:
+          severity: warning
+          team: ml
+          service: agents
+        annotations:
+          summary: "Agent {{ $labels.agent_name }} exceeding token budget"
+          description: "Agent {{ $labels.agent_name }} is using {{ $value }} tokens/hour."
+
+      # ── Throughput ────────────────────────────────────────────────────────────
+      - alert: APILowThroughput
+        expr: |
+          sum(rate(http_requests_total{job="supply-chain-api",status!~"5.."}[5m])) < 0.1
+        for: 10m
+        labels:
+          severity: warning
+          team: platform
+          service: api
+        annotations:
+          summary: "API throughput abnormally low"
+          description: "API is processing {{ $value | humanize }} req/s. Possible traffic drop or outage."
+
+      - alert: OrderProcessingBacklog
+        expr: |
+          sum(celery_queue_length{queue="orders"}) > 1000
+        for: 5m
+        labels:
+          severity: warning
+          team: platform
+          service: celery
+        annotations:
+          summary: "Order processing queue backlog > 1000"
+          description: "Order queue has {{ $value }} pending tasks. Consider scaling workers."
+
+      - alert: OrderProcessingQueueCritical
+        expr: |
+          sum(celery_queue_length{queue="orders"}) > 5000
+        for: 2m
+        labels:
+          severity: critical
+          team: platform
+          service: celery
+        annotations:
+          summary: "Order processing queue critical backlog"
+          description: "Order queue has {{ $value }} pending tasks. Immediate action required."
+          slack_channel: "#alerts-critical"
+
+  - name: database.rules
+    rules:
+      - alert: DatabaseConnectionPoolExhausted
+        expr: |
+          pg_stat_database_numbackends{datname="supply_chain"}
+          / pg_settings_max_connections > 0.80
+        for: 2m
+        labels:
+          severity: critical
+          team: platform
+          service: postgres
+        annotations:
+          summary: "PostgreSQL connection pool 80% utilized"
+          description: "{{ $value | humanizePercentage }} of connections in use. Risk of connection exhaustion."
+          runbook_url: "https://wiki.internal/runbooks/db-connection-pool"
+          slack_channel: "#alerts-critical"
+
+      - alert: DatabaseSlowQueries
+        expr: |
+          rate(pg_stat_statements_total_time[5m]) / rate(pg_stat_statements_calls[5m]) > 1000
+        for: 5m
+        labels:
+          severity: warning
+          team: platform
+          service: postgres
+        annotations:
+          summary: "Slow database queries detected"
+          description: "Average query time is {{ $value }}ms. Review slow query log."
+
+      - alert: DatabaseHighReplicationLag
+        expr: |
+          pg_replication_lag > 30
+        for: 2m
+        labels:
+          severity: critical
+          team: platform
+          service: postgres
+        annotations:
+          summary: "PostgreSQL replication lag > 30s"
+          description: "Replication lag is {{ $value | humanizeDuration }}. Failover risk if primary fails."
+          slack_channel: "#alerts-critical"

@@ -1,0 +1,21 @@
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: supply-chain-api-pdb
+  namespace: supply-chain
+spec:
+  minAvailable: 2
+  selector:
+    matchLabels:
+      app: supply-chain-api
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: supply-chain-worker-pdb
+  namespace: supply-chain
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: supply-chain-worker
