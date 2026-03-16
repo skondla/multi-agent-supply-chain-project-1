@@ -9,6 +9,6 @@ mypy==1.8.0
 locust==2.24.0
 factory-boy==3.3.0
 Faker==23.3.4
-responses==0.25.0
+responses==0.26.0
 pytest-mock==3.12.0
-aioresponses==0.7.6
+aioresponses==0.7.8
